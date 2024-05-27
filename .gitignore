@@ -7,7 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+movie_backend/node_modules/
+movie_project/node_modules/
+movie_backend/build/
+movie_project/build/
+movie_backend/.env
 dist
 dist-ssr
 *.local
