@@ -2,16 +2,22 @@ import { useContext } from "react";
 import { LoginContext } from "../userContext";
 import NavBarLoggedIn from "./NavBarLoggedIn";
 import Scroller from "./Scroller";
+import "../HomePage.css";
+import SearchBar from "./SearchBar";
 function HomePage() {
   const { user, updateUser } = useContext(LoginContext);
   return (
     <>
-      <div className="mb-20">
-        <NavBarLoggedIn></NavBarLoggedIn>
-      </div>
+      <div className="main-container shadow-lg">
+        <NavBarLoggedIn />
+        <div className="mt-8">
+          <SearchBar></SearchBar>
+        </div>
 
-      {/* <img src={varuiable} className="mt-20"></img> */}
-      <Scroller></Scroller>
+        <div className="">
+          <Scroller />
+        </div>
+      </div>
     </>
   );
 }

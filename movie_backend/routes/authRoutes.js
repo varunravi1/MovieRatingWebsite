@@ -28,6 +28,6 @@ router.post("/login", loginUser); //runs loginUser from authController when aski
 router.get("/refresh_token", verifyRefreshToken);
 // router.put("/refresh_token", updateRefreshToken);
 router.delete("/refresh_token", deleteRefreshToken);
-router.get("/scroller", requestScroller);
+// router.get("/scroller", requestScroller);
 
 module.exports = router;

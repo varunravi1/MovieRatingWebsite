@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { PiBookmarkSimple } from "react-icons/pi";
+import { useNavigate } from "react-router-dom";
 import { infinity } from "ldrs";
 interface Movie {
   id: number;
@@ -11,6 +12,7 @@ interface Movie {
 }
 infinity.register();
 function Scroller() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [scoresDict, setScoresDict] = useState<{ [key: string]: string }>({});
   const [movieData, setMovieData] = useState<any[]>([]);
@@ -19,29 +21,23 @@ function Scroller() {
   }, []);
   const sendAPIReq = async () => {
     try {
-      const response = await axios.get("/scroller");
+      const response = await axios.get("/homepage/scroller");
       console.log("back from scoller function");
       // console.log(response.data.results);
+      // console.log(response.data.results);
+
       const movies = response.data.results.filter((movie: Movie) => {
         return (
-          new Date(movie.release_date) > new Date("2024-03-01") &&
+          new Date(movie.release_date) > new Date("2023-12-01") &&
           movie.original_language === "en"
         );
       });
-      console.log(movies);
-      // movies.sort((a: Movie, b: Movie) => {
-      //   return (
-      //     new Date(b.release_date).getTime() -
-      //     new Date(a.release_date).getTime()
-      //   );
-      // });
-      //   console.log(movies);
+      // console.log(response.data.results);
+
       const movieTitles = movies.map((movie: Movie) => {
-        //getting the titles for movies
         return movie.original_title;
       });
-      //   console.log(movieTitles);
-      // const scoreDictTemp: { [key: string]: string } = {};
+      // console.log(movieTitles);
       setLoading(true);
       for (var i = 0; i < movieTitles.length; i++) {
         movieTitles[i] = movieTitles[i]
@@ -52,30 +48,10 @@ function Scroller() {
           .replace(/ /g, "_")
           .replace(/_+/g, "_"); // Replace multiple underscores with a single underscore;
       }
-      //   console.log(movieTitles[9]);
-      //   console.log(movies[9].original_title);
-      //   console.log(movies[9].release_date);
-      //   let audienceScores: Array<string> = [];
-      //   let criticScores: Array<string> = [];
-      // for (var i = 0; i < movies.length; i++) {
-      //   const scores = await axios.post("/user/scores", {
-      //     title: movies[i].original_title,
-      //     url: movieTitles[i],
-      //     date: movies[i].release_date,
-      //   });
-      //   // audienceScores.push(scores.data.audienceScore);
-      //   // criticScores.push(scores.data.criticScore);
-      //   scoreDictTemp[movies[i].original_title] =
-      //     scores.data.criticScore > scores.data.audienceScore
-      //       ? scores.data.criticScore
-      //       : scores.data.audienceScore;
 
-      //   // console.log(scores.data.criticScore);
-      //   // console.log(scores.data.audienceScores);
-      // }
       console.log("Sending request to get scores");
       const scoresPromises = movies.map((movie: Movie, i: number) =>
-        axios.post("/user/scores", {
+        axios.post("/homepage/scores", {
           title: movie.original_title,
           url: movieTitles[i],
           date: movie.release_date,
@@ -91,7 +67,7 @@ function Scroller() {
         return dict;
       }, {});
 
-      console.log(scoreDictTemp);
+      // console.log(scoreDictTemp);
       setScoresDict(scoreDictTemp);
       setMovieData(movies);
       setLoading(false);
@@ -101,10 +77,12 @@ function Scroller() {
     }
   };
   const handleClickBookmark = () => {};
-  const handlePosterClick = () => {};
+  const handlePosterClick = (movie: Movie) => {
+    navigate(`/${movie.original_title ? "movie" : "tv"}/${movie.id}`);
+  };
   return (
     <>
-      <h1 className="text-white bg-yt-black text-center font-bold font-sans text-4xl pt-8">
+      <h1 className="text-white bg-yt-black text-center roboto-bold text-4xl pt-8 tracking-[1px]">
         NEW RELEASES
       </h1>
 
@@ -119,7 +97,9 @@ function Scroller() {
               {movieData.map((movie) => (
                 <div key={movie.id} className="movie-poster-container mr-10">
                   <img
-                    onClick={handlePosterClick}
+                    onClick={() => {
+                      handlePosterClick(movie);
+                    }}
                     key={movie.id}
                     src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
                     className="movie-poster pb-2 cursor-pointer"
@@ -144,11 +124,13 @@ function Scroller() {
                 </div>
               ))}
             </div>
-            <div className="scroller ">
+            <div className="scroller">
               {movieData.map((movie) => (
                 <div key={movie.id} className="movie-poster-container mr-10">
                   <img
-                    onClick={handlePosterClick}
+                    onClick={() => {
+                      handlePosterClick(movie);
+                    }}
                     key={movie.id}
                     src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
                     className="movie-poster pb-2 cursor-pointer"

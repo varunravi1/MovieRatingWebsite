@@ -25,13 +25,13 @@ function NavBar({ parallaxref }: LandingPageNavigator) {
         className="fixed flex justify-center top-0 left-0 right-0 z-10 bg-transparent py-5 "
       >
         <div className="flex space-x-20 ">
-          <button onClick={scrolltoHome} className="navBar">
+          <button onClick={scrolltoHome} className="navBar roboto-bold ">
             Home
           </button>
-          <button onClick={scrollToFeatures} className="navBar">
+          <button onClick={scrollToFeatures} className="navBar roboto-bold">
             Features
           </button>
-          <button onClick={scrollToLogin} className="navBar">
+          <button onClick={scrollToLogin} className="navBar roboto-bold">
             Sign In
           </button>
         </div>

@@ -1,0 +1,21 @@
+body {
+  background-color: #1c1c1c; /* Dark grey background for the whole page */
+  color: #ffffff; /* White text color for contrast */
+  font-family: "Arial", sans-serif; /* Consistent font for readability */
+}
+.main-container {
+  margin: auto;
+  max-width: 1300px; /* Limiting content width with centered content */
+  /* padding: 20px; */
+  background-color: #121212; /* Keeps the focus on content */
+}
+.content {
+  padding: 20px;
+  min-height: 400px; /* Just for demonstration */
+}
+.footer {
+  padding: 10px 0;
+  text-align: center;
+  border-top: 1px solid #eee;
+  margin-top: 20px;
+}

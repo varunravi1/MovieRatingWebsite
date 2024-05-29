@@ -2,7 +2,7 @@ const cheerio = require("cheerio");
 const axios = require("axios");
 const ScoreSchema = require("../models/scores");
 
-const WEEK_EXPIRATION = 604800;
+const WEEK_EXPIRATION = 259200;
 // const { search } = require("../routes/userRoutes");
 
 // await client.connect();
@@ -15,17 +15,44 @@ const requestScroller = async (req, res) => {
       //   console.log(JSON.parse(data));
       return res.json(JSON.parse(data));
     } else {
-      const response = await axios.get(
-        "https://api.themoviedb.org/3/movie/now_playing?language=en-US&api_key=8fa4fa6e422540365b21966c86cd2f9a"
+      console.log("cache missed");
+      // const [response1, response2] = await Promise.all([
+      //   axios.get(
+      //     `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
+      //       "2024-03-01"
+      //     )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&page=1`
+      //   ),
+      //   axios.get(
+      //     `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
+      //       "2024-03-01"
+      //     )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&page=2`
+      //   ),
+      // ]);
+      // const combinedResults = [...response1.data, ...response2.data];
+      const response1 = await axios.get(
+        `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
+          "2024-03-01"
+        )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&page=1`
       );
       console.log("API Hit in MovieScroller");
-      res.json(response.data);
+      const response2 = await axios.get(
+        `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
+          "2024-03-01"
+        )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&page=2`
+      );
+      const combinedResults = {
+        ...response1.data, // This spreads the first response object properties
+        results: [...response1.data.results, ...response2.data.results], // This specifically combines the results arrays
+      };
+      // console.log(combinedResults);
+      // console.log("TYPE OF RESPONSE");
+      // console.log(typeof response1.data);
+      res.json(combinedResults);
       //   console.log(JSON.stringify(response.data));
       //   console.log(response.data);
-      req.redisClient.set("new-release", JSON.stringify(response.data), {
+      req.redisClient.set("new-release", JSON.stringify(combinedResults), {
         EX: WEEK_EXPIRATION,
       });
-      console.log(JSON.stringify(response.data));
     }
   } catch (error) {
     console.log("Something went wrong with api request");
@@ -34,10 +61,14 @@ const requestScroller = async (req, res) => {
 };
 const searchRottenTomatoes = async (title, date) => {
   console.log("inside search rottentomatoes");
+
   const searchUrl = `https://www.rottentomatoes.com/search?search=${encodeURIComponent(
     title
   )}`;
+
   const year = date.split("-")[0];
+  console.log(searchUrl, year);
+  console.log(year - 1);
   //   console.log(searchUrl);
   //   console.log(year);
   let resultTitle,
@@ -59,8 +90,10 @@ const searchRottenTomatoes = async (title, date) => {
       console.log("This is result year");
       console.log(resultYear);
       if (
-        resultTitle.toLowerCase() === title.toLowerCase() &&
-        resultYear === year
+        (resultTitle.toLowerCase() === title.toLowerCase() &&
+          resultYear === year) ||
+        (resultTitle.toLowerCase() === title.toLowerCase() &&
+          resultYear === (year - 1).toString())
       ) {
         console.log("checking if the date and name matches");
         matchingHref = $(element).find('a[data-qa="info-name"]').attr("href");
@@ -101,15 +134,15 @@ const searchForScores = async (url, date) => {
     console.log(criticsScore);
     console.log(audienceScore);
     const urlwithoutDate = url.replace(/_\d{4}$/, "");
-    const score = await ScoreSchema.create({
-      title: urlwithoutDate,
-      date: date,
-      criticScore: criticsScore,
-      audienceScore: audienceScore,
-    }).catch((error) => {
-      console.log("error creating movie to store in db");
-      console.log(error);
-    });
+    // const score = await ScoreSchema.create({
+    //   title: urlwithoutDate,
+    //   date: date,
+    //   criticScore: criticsScore,
+    //   audienceScore: audienceScore,
+    // }).catch((error) => {
+    //   console.log("error creating movie to store in db");
+    //   console.log(error);
+    // });
     return {
       criticScore: criticsScore || "Not found",
       audienceScore: audienceScore || "Not found",
@@ -148,32 +181,77 @@ const scraper = async (req, res) => {
         title: req.body.url,
         date: year,
       });
-      if (check) {
-        console.log("FOUND THE MOVIE IN DB");
-        await req.redisClient.set(
-          `rt-audienceScore-${req.body.url}`,
-          JSON.stringify(check.audienceScore),
-          {
-            EX: WEEK_EXPIRATION,
-          }
-        );
-        await req.redisClient.set(
-          `rt-criticScore-${req.body.url}`,
-          JSON.stringify(check.criticScore),
-          {
-            EX: WEEK_EXPIRATION,
-          }
-        );
-        res.json({
-          criticScore: check.criticScore,
-          audienceScore: check.audienceScore,
-        });
+      // if (check) {
+      //   console.log("FOUND THE MOVIE IN DB");
+      //   await req.redisClient.set(
+      //     `rt-audienceScore-${req.body.url}`,
+      //     JSON.stringify(check.audienceScore),
+      //     {
+      //       EX: WEEK_EXPIRATION,
+      //     }
+      //   );
+      //   await req.redisClient.set(
+      //     `rt-criticScore-${req.body.url}`,
+      //     JSON.stringify(check.criticScore),
+      //     {
+      //       EX: WEEK_EXPIRATION,
+      //     }
+      //   );
+      //   res.json({
+      //     criticScore: check.criticScore,
+      //     audienceScore: check.audienceScore,
+      //   });
+      // } else {
+      const underscores = countUnderscores(req.body.url);
+      if (underscores > 3) {
+        await delay(Math.random() * 2000);
+        // console.log(req.body.url);
+        searchForScores(req.body.url, year)
+          .then(async (result) => {
+            await req.redisClient.set(
+              `rt-audienceScore-${req.body.url}`,
+              JSON.stringify(result.audienceScore),
+              {
+                EX: WEEK_EXPIRATION,
+              }
+            );
+            await req.redisClient.set(
+              `rt-criticScore-${req.body.url}`,
+              JSON.stringify(result.criticScore),
+              {
+                EX: WEEK_EXPIRATION,
+              }
+            );
+            res.json({
+              criticScore: result.criticScore,
+              audienceScore: result.audienceScore,
+            });
+          })
+          .catch(async (error) => {
+            await req.redisClient.set(
+              `rt-audienceScore-${req.body.url}`,
+              JSON.stringify("Not Available"),
+              {
+                EX: WEEK_EXPIRATION,
+              }
+            );
+            await req.redisClient.set(
+              `rt-criticScore-${req.body.url}`,
+              JSON.stringify("Not Available"),
+              {
+                EX: WEEK_EXPIRATION,
+              }
+            );
+            //   res.status(500).json({ err: error });
+            res.json({ error: "unavailable on rotten tomatoes." });
+          });
+        // console.log(score);
       } else {
-        const underscores = countUnderscores(req.body.url);
-        if (underscores > 3) {
-          await delay(Math.random() * 2000);
-          // console.log(req.body.url);
-          searchForScores(req.body.url, year)
+        await delay(Math.random() * 2000);
+        const searchLink = await searchRottenTomatoes(req.body.title, year);
+        console.log(searchLink);
+        if (searchLink) {
+          searchForScores(searchLink, year)
             .then(async (result) => {
               await req.redisClient.set(
                 `rt-audienceScore-${req.body.url}`,
@@ -195,44 +273,13 @@ const scraper = async (req, res) => {
               });
             })
             .catch((error) => {
-              //   res.status(500).json({ err: error });
-              res.json({ error: "unavailable on rotten tomatoes." });
+              res.staus(500).json({ err: error });
             });
-          // console.log(score);
         } else {
-          await delay(Math.random() * 2000);
-          const searchLink = await searchRottenTomatoes(req.body.title, year);
-          console.log(searchLink);
-          if (searchLink) {
-            searchForScores(searchLink, year)
-              .then(async (result) => {
-                await req.redisClient.set(
-                  `rt-audienceScore-${req.body.url}`,
-                  JSON.stringify(result.audienceScore),
-                  {
-                    EX: WEEK_EXPIRATION,
-                  }
-                );
-                await req.redisClient.set(
-                  `rt-criticScore-${req.body.url}`,
-                  JSON.stringify(result.criticScore),
-                  {
-                    EX: WEEK_EXPIRATION,
-                  }
-                );
-                res.json({
-                  criticScore: result.criticScore,
-                  audienceScore: result.audienceScore,
-                });
-              })
-              .catch((error) => {
-                res.staus(500).json({ err: error });
-              });
-          } else {
-            res.status(401).json({ err: "Not found" });
-          }
+          res.status(401).json({ err: "Not found" });
         }
       }
+      //}
     }
   } catch (error) {
     console.error("Error fetching data: ", error);
@@ -242,9 +289,40 @@ const scraper = async (req, res) => {
 function delay(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }
+const searchFunc = async (req, res) => {
+  // console.log(req.body.signal);
+  const searchQuery = req.body.search.replace(" ", "+");
+  console.log("in the search func");
+  try {
+    const [responseMovie, responseShow] = await Promise.all([
+      axios.get(
+        `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
+          searchQuery
+        )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&language=en-US`
+      ),
+      axios.get(
+        `https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(
+          searchQuery
+        )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&language=en-US`
+      ),
+    ]);
+    // console.log(responseShow.data);
+    // const response = await axios.get(
+    //   `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
+    //     searchQuery
+    //   )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&language=en-US`
+    // );
+    res.json({ movies: responseMovie.data, tv: responseShow.data });
+    // console.log(response.data);
+  } catch (error) {
+    console.log("Failed to get data from api");
+    console.error(error);
+  }
+};
 
 module.exports = {
   requestScroller,
   scraper,
   delay,
+  searchFunc,
 };

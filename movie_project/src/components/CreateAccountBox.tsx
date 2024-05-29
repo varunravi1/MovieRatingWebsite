@@ -105,7 +105,7 @@ function CreateAccountBox({ onFlip }: Props) {
   };
   return (
     <>
-      <div className="flex items-end justify-center h-screen bg-transparent font-sans mt-20">
+      <div className="flex items-end justify-center h-screen bg-transparent mt-20">
         <div className="relative z-0 w-full max-w-xs shadow-sm">
           <form
             onSubmit={handleSubmit}
