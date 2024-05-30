@@ -1,6 +1,13 @@
 const express = require("express");
 const axios = require("axios");
-const { authenticateUser } = require("../controllers/userController");
+const {
+  authenticateUser,
+  getLists,
+  addList,
+  updateList,
+  deleteList,
+  returnUser,
+} = require("../controllers/userController");
 const { scraper } = require("../controllers/tmdbController");
 const cors = require("cors");
 const router = express.Router();
@@ -12,10 +19,10 @@ router.use(
     origin: "http://localhost:5173",
   })
 );
-// router.use(authenticateUser);
+router.use(authenticateUser);
 router.get("/", (req, res) => {
   if (req.decoded) {
-    res.json({ user: req.decoded });
+    res.json({ userAuthentication: req.decoded.email });
   } else {
     res.json("Token Is Wrong");
   }
@@ -33,7 +40,13 @@ router.get("/scroll", async (req, res) => {
     console.error("Failed to fetch data from api");
   }
 });
-router.post("/scores", scraper);
-router.get("/homepage", (req, res) => {});
+// router.get("/", returnUser);
+router.post("/list", getLists);
+router.post("/list/add", addList);
+router.patch("/list:listID", updateList);
+router.delete("/list:listID", deleteList);
+
+// router.post("/scores", scraper);
+// router.get("/homepage", (req, res) => {});
 
 module.exports = router;

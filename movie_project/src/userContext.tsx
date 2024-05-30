@@ -25,18 +25,17 @@ function UserContext({ children }: children) {
   const [user, updateUser] = useState<string | null>(null);
   useEffect(() => {
     console.log("UserContext useeffect is running rn");
-    console.log(user);
+    console.log("User" + user);
     setAuthToken(localStorage.getItem("accessToken"));
+    console.log(localStorage.getItem("accessToken"));
     if (user == null) {
       axios
         .get("/user")
         .then((response) => {
           console.log("THIS IS THE RESPONSE FROM THE AUTHENTICATION ENDPOINT");
-          //   console.log(response.data.user.email);
-          updateUser(response.data.user[0].email);
-
-          console.log(response);
-          console.log(user);
+          console.log(response.data.userAuthentication);
+          updateUser(response.data.userAuthentication);
+          // console.log(user);
           //   navigate("/HomePage");
         })
         .catch((error: any) => {
@@ -55,7 +54,7 @@ function UserContext({ children }: children) {
                 console.log(typeof response.data.user[0].email);
                 // console.log(response.data.user.email);
 
-                updateUser(response.data.user[0].email);
+                updateUser(response.data.userAuthentication);
                 console.log(user + "HEllo");
                 // navigate("/HomePage");
               });

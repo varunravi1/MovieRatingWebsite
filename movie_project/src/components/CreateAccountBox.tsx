@@ -41,10 +41,11 @@ function CreateAccountBox({ onFlip }: Props) {
       terrorMessage(false);
       //SEND USER INFORMATION TO DATABSE
       try {
-        const check = await axios.post("/email_check", {
+        const check = await axios.post("/check_email", {
           username: userData.username,
           email: userData.email,
         });
+        console.log(check);
         const response = await axios.post("/register", {
           username: userData.username,
           email: userData.email,

@@ -49,6 +49,8 @@ const registerUser = async (req, res) => {
       password: pass,
       refreshToken: refreshToken,
     });
+    console.log("Response from creating the user");
+    console.log(user.id);
     res
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -56,7 +58,7 @@ const registerUser = async (req, res) => {
         secure: true,
         sameSite: "Strict",
       })
-      .json({ accessToken: accessToken });
+      .json({ accessToken: accessToken, id: user.id });
   } catch (error) {
     console.log(error);
   }
@@ -91,28 +93,33 @@ const loginUser = async (req, res) => {
       console.log(isMatch);
       if (isMatch) {
         const refreshToken = jwt.sign(
+          //CREATING A NEW REFRESH TOKEN EVERYTIME WE SIGN IN
           { email: login },
           process.env.LOGIN_REFRESH_SECRET
         );
         res.cookie("refreshToken", refreshToken, {
+          //PUTTING IT IN THE COOKIE SO IT IS SECURE
           httpOnly: true,
           path: "/refresh_token",
           secure: true,
           sameSite: "Strict",
         });
         const result = await UserSchema.updateOne(
+          //UPDATING THE REFRESH TOKEN IN THE DATABASE
           { email: login },
           { $set: { refreshToken: refreshToken } }
         );
         console.log(result);
         console.log("EMAIL AND PASSWORD MATCH!!!!!!!!!!");
         if (typeof bearerHeader !== "undefined") {
+          //CHECKING IF THERE IS A ACCESSTOKEN IN THE REQUEST HEADER
           const accessToken = bearerHeader.split(" ")[1];
           // console.log(accessToken);
           jwt.verify(accessToken, process.env.LOGIN_SECRET, (err, data) => {
+            //VERIFYING TOKEN WITH SECRET
             if (err) {
               res.status(403).json({ message: "Token is invalid or expired" });
-              console.log("Token is Expired");
+              console.log("Token is Expired"); //TOKEN IS INVALID or EXPIRED
             } else {
               console.log("Token Works");
               res.json({ data: data });
@@ -177,11 +184,16 @@ const deleteRefreshToken = async (req, res) => {
 };
 
 const checkEmail = async (req, res) => {
-  const { username, email } = req.data;
+  console.log("inside check_email");
+  console.log(req.body);
+  const { username, email } = req.body;
   await UserSchema.findOne({ $or: [{ email: email }, { username: username }] })
     .then((response) => {
+      console.log(response);
       if (response) {
         res.status(401).json({ error: "Username/Email Already exists" });
+      } else {
+        res.json({ msg: "green light to go ahead and register" });
       }
     })
     .catch((error) => {

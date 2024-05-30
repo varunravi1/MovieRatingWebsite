@@ -17,6 +17,7 @@ router.post("/", async (req, res) => {
   const urlMedia = `https://api.themoviedb.org/3/${type}/${id}?api_key=8fa4fa6e422540365b21966c86cd2f9a`;
   const urlCredits = `https://api.themoviedb.org/3/${type}/${id}/credits?api_key=8fa4fa6e422540365b21966c86cd2f9a`;
   const urlTrailer = `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=8fa4fa6e422540365b21966c86cd2f9a`;
+  const urlStreaming = "";
   const [mediaResult, creditResult, trailerResult] = await Promise.all([
     axios.get(urlMedia),
     axios.get(urlCredits),

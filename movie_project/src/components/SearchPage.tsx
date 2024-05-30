@@ -206,21 +206,22 @@ function SearchPage() {
             <div>
               <div className="where-to-watch"></div>
               <div className="roboto-bold mb-3">Cast</div>
-              <div className="flex max-w-96 flex-wrap rounded-3xl justify-between">
+              <div className="flex max-w-full max-h-80 overflow-x-auto whitespace-nowrap rounded-3xl justify-between">
                 {movieData &&
                   movieData.cast.map((cast) => (
                     <>
-                      <div className="px-3 py-3 w-44">
+                      <div className="px-4 py-3 w-44 flex-shrink-0">
+                        <img
+                          src={`https://image.tmdb.org/t/p/w500/${cast.profile_path}`}
+                          className="rounded-xl mb-2"
+                        ></img>
                         <h1
                           className="roboto-regular text-base"
                           key={cast.cast_id}
                         >
                           {cast.name}
                         </h1>
-                        <p className="roboto-light text-xs">
-                          {" "}
-                          {cast.character}
-                        </p>
+                        <p className="roboto-light text-xs">{cast.character}</p>
                       </div>
                     </>
                   ))}

@@ -10,8 +10,12 @@ interface Movie {
   release_date: string;
   original_language: string;
 }
+interface Props {
+  setListScreen: (variable: boolean) => void;
+  mediaData: React.MutableRefObject<Movie | null>;
+}
 infinity.register();
-function Scroller() {
+function Scroller({ setListScreen, mediaData }: Props) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [scoresDict, setScoresDict] = useState<{ [key: string]: string }>({});
@@ -76,7 +80,11 @@ function Scroller() {
       //   console.log(error);
     }
   };
-  const handleClickBookmark = () => {};
+  const handleClickBookmark = (movie: Movie) => {
+    setListScreen(true);
+    console.log(movie);
+    mediaData.current = movie;
+  };
   const handlePosterClick = (movie: Movie) => {
     navigate(`/${movie.original_title ? "movie" : "tv"}/${movie.id}`);
   };
@@ -117,7 +125,9 @@ function Scroller() {
                         : "Not Available"}
                     </p>
                     <PiBookmarkSimple
-                      onClick={handleClickBookmark}
+                      onClick={() => {
+                        handleClickBookmark(movie);
+                      }}
                       className="size-9 absolute mt-56 bookmark-icon curso"
                     />
                   </div>
@@ -148,7 +158,7 @@ function Scroller() {
                         : "Not Available"}
                     </p>
                     <PiBookmarkSimple
-                      onClick={handleClickBookmark}
+                      onClick={() => handleClickBookmark(movie)}
                       className="size-9 absolute mt-56 bookmark-icon curso"
                     />
                   </div>

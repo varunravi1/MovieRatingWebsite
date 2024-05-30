@@ -8,7 +8,7 @@ export default {
         uv: "#4E4187",
         crayola: "#EE4266",
         plat: "#E7E7E7",
-        "dim-gray": "#7A7265",
+        "dim-gray": "#272727",
         "yt-black": "#121212",
         "err-red": "#FF0000",
         purp: "#4F359B",

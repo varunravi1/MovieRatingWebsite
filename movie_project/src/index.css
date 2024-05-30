@@ -134,3 +134,11 @@ body {
 .search-container:hover {
   transform: scale(1.03);
 }
+.pop-up-lists-container {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+.pop-up-lists {
+}
+.pop-up-lists:active {
+  transform: scale(0.95);
+}

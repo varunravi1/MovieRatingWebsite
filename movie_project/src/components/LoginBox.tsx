@@ -27,7 +27,7 @@ function LoginBox({ onFlip }: Props) {
         login: userLogin.login,
         password: userLogin.password,
       }); // SENDING LOGIN INFORMATION TO THE SERVER TO CHECK IF -THE USER EXISTS
-      // console.log(user);
+      // console.log(response);
       console.log("Re-Logged In");
       updateUser(userLogin.login);
       navigate("/HomePage");
@@ -39,7 +39,7 @@ function LoginBox({ onFlip }: Props) {
 
       if (error.response && error.response.status === 403) {
         console.log(
-          "Token is Expired - Trying to reach endpoint to refresh access token"
+          "Token is Expired - Trying to reach endpoint to refresh access token" //if access token is not valid, we check to see if the refresh token sent in the cookie is the same one as in the db.
         );
         try {
           axios.get("/refresh_token").then((response) => {

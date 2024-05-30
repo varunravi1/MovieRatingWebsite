@@ -17,6 +17,8 @@ function NavBarLoggedIn() {
       navigate("/");
     });
   };
+  console.log("This is what is stored in user");
+  console.log(user);
   return (
     <>
       {signUp ? (
