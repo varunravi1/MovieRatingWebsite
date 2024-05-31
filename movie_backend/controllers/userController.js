@@ -14,9 +14,10 @@ const authenticateUser = (req, res, next) => {
       req.decoded = decoded;
       next();
     } else {
-      res.status(403).json({ error: "no access token provided" });
+      res.status(404).json({ error: "no access token provided" });
     }
   } catch (err) {
+    console.log(err);
     console.log("THIS IS THE FAILED AUTHENTICATION ERROR");
     //console.log(err);
     res.status(403).json({ error: "Expired Token" });
@@ -28,6 +29,7 @@ const getLists = async (req, res) => {
   try {
     const listData = await ListSchema.find({ email: user });
     console.log("List Data" + listData);
+    console.log(req.decoded);
     res.json({ listData: listData, userAuthentication: req.decoded.email });
   } catch (error) {
     console.log("no lists found");

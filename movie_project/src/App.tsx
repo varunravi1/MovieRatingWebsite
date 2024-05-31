@@ -9,6 +9,7 @@ import UserContext from "./userContext";
 import HomePage from "./components/HomePage";
 axios.defaults.baseURL = "http://localhost:8000";
 import axios from "axios";
+import MyLists from "./components/MyLists";
 
 axios.defaults.withCredentials = true;
 let router = createBrowserRouter([
@@ -23,6 +24,10 @@ let router = createBrowserRouter([
   {
     path: ":type/:id",
     element: <SearchPage />,
+  },
+  {
+    path: "/MyList",
+    element: <MyLists />,
   },
 ]);
 function App() {

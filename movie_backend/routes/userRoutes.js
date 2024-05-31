@@ -41,6 +41,23 @@ router.get("/scroll", async (req, res) => {
   }
 });
 // router.get("/", returnUser);
+router.get("/time_left", (req, res) => {
+  try {
+    if (typeof bearerHeader !== "undefined") {
+      const accessToken = bearerHeader.split(" ")[1];
+      const decoded = jwt.decode(accessToken, process.env.LOGIN_SECRET);
+      console.log("Checking time left in token");
+      console.log(decoded);
+      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds since epoch
+      const remainingTime = decoded.exp - currentTime; // Remaining time in seconds
+      res.json(remainingTime);
+    } else {
+      res.status(404).json({ error: "no access token provided" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 router.post("/list", getLists);
 router.post("/list/add", addList);
 router.patch("/list:listID", updateList);

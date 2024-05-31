@@ -18,7 +18,7 @@ const comparePass = async (password, hashed) => {
 };
 const issueToken = (data) => {
   return jwt.sign({ email: data }, process.env.LOGIN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "30m",
   });
 };
 //REGISTERING USER

@@ -16,6 +16,7 @@ interface Movie {
 function HomePage() {
   const { user, updateUser } = useContext(LoginContext);
   const [listScreen, setListScreen] = useState(false);
+  const [rerenderBookmark, setrerenderBookmark] = useState(false);
   let mediaData = useRef<Movie | null>(null);
   return (
     <>
@@ -26,10 +27,18 @@ function HomePage() {
         </div>
 
         <div className="">
-          <Scroller mediaData={mediaData} setListScreen={setListScreen} />
+          <Scroller
+            rerenderBookmark={rerenderBookmark}
+            setrerenderBookmark={setrerenderBookmark}
+            listScreen={listScreen}
+            mediaData={mediaData}
+            setListScreen={setListScreen}
+          />
         </div>
         {listScreen && (
           <PopUpLists
+            rerenderBookmark={rerenderBookmark}
+            setrerenderBookmark={setrerenderBookmark}
             mediaData={mediaData}
             setListScreen={setListScreen}
           ></PopUpLists>

@@ -7,6 +7,8 @@ import { set } from "zod";
 interface Props {
   setListScreen: (variable: boolean) => void;
   mediaData: React.MutableRefObject<Movie | null>;
+  setrerenderBookmark: (variable: boolean) => void;
+  rerenderBookmark: boolean;
 }
 interface Movie {
   id: number;
@@ -21,7 +23,12 @@ interface media {
   title: string;
   media: {};
 }
-function PopUpLists({ setListScreen, mediaData }: Props) {
+function PopUpLists({
+  setListScreen,
+  mediaData,
+  rerenderBookmark,
+  setrerenderBookmark,
+}: Props) {
   const { user } = useContext(LoginContext);
   const [listData, setListData] = useState<any[] | null>([]);
   const [createList, setcreateList] = useState(false);
@@ -31,6 +38,7 @@ function PopUpLists({ setListScreen, mediaData }: Props) {
   useEffect(() => {
     getLists();
   }, []);
+
   const getLists = async () => {
     try {
       console.log("in getLists");
@@ -56,6 +64,7 @@ function PopUpLists({ setListScreen, mediaData }: Props) {
   };
   const handleAddtoList = async (list: media) => {
     try {
+      console.log(mediaData.current);
       const result = await axios.patch(`/user/list${list._id}`, {
         user: user,
         title: list.title,
@@ -64,6 +73,7 @@ function PopUpLists({ setListScreen, mediaData }: Props) {
       });
       console.log(result);
       setListScreen(false);
+      setrerenderBookmark(!rerenderBookmark);
     } catch (error) {}
   };
   return (
@@ -94,18 +104,21 @@ function PopUpLists({ setListScreen, mediaData }: Props) {
             </>
           ) : (
             <>
-              {listData?.map((list: media) => (
-                <div className="" key={list._id}>
-                  <div
-                    className=" roboto-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-plat hover:text-yt-black active:scale-95 active:ring-4 ring-purp"
-                    onClick={() => {
-                      handleAddtoList(list);
-                    }}
-                  >
-                    {list.title}
+              <div className=" max-h-56 overflow-auto mb-3">
+                {listData?.map((list: media) => (
+                  <div className="" key={list._id}>
+                    <div
+                      className="roboto-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-plat hover:text-yt-black active:scale-95 active:ring-4 ring-purp overflow-auto"
+                      onClick={() => {
+                        handleAddtoList(list);
+                      }}
+                    >
+                      {list.title}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
               <div
                 className="ml-8 flex items-center w-40 space-x-4 cursor-pointer bg-yt-black py-2 rounded-xl hover:bg-plat hover:text-yt-black pop-up-lists"
                 tabIndex={0}

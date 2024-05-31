@@ -1,8 +1,10 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { PiBookmarkSimple } from "react-icons/pi";
+import { useEffect, useState, useContext, useRef } from "react";
+import { PiBookmarkSimple, PiBookmarkSimpleFill } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
 import { infinity } from "ldrs";
+import { LoginContext } from "../userContext";
+import BookMarkMiddleMan from "./BookMarkMiddleMan";
 interface Movie {
   id: number;
   original_title: string;
@@ -10,20 +12,50 @@ interface Movie {
   release_date: string;
   original_language: string;
 }
+interface media {
+  _id: string;
+  mediaType: string;
+  title: string;
+  media: [];
+}
 interface Props {
   setListScreen: (variable: boolean) => void;
   mediaData: React.MutableRefObject<Movie | null>;
+  listScreen: boolean;
+  setrerenderBookmark: (variable: boolean) => void;
+  rerenderBookmark: boolean;
 }
 infinity.register();
-function Scroller({ setListScreen, mediaData }: Props) {
+function Scroller({
+  listScreen,
+  setListScreen,
+  mediaData,
+  rerenderBookmark,
+  setrerenderBookmark,
+}: Props) {
+  const { user, isAuthLoading } = useContext(LoginContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [scoresDict, setScoresDict] = useState<{ [key: string]: string }>({});
   const [movieData, setMovieData] = useState<any[]>([]);
+  const [listData, setListData] = useState<any[]>([]);
+  const bookmarkedLists = useRef<(0 | 1)[]>([]);
+  const movieLists = useRef(new Set());
+  // const movieLists = new Set();
+  // const bookmarkedArray: (0 | 1)[] = [];
+  // let bookmarkedLists: (0 | 1)[] | undefined;
   useEffect(() => {
-    sendAPIReq();
-  }, []);
+    if (!isAuthLoading) {
+      sendAPIReq();
+    }
+  }, [isAuthLoading]);
+
+  // useEffect(() => {
+  //   sendAPIReq();
+  //   console.log("in the listscreen refresh useEffect");
+  // }, [listScreen]);
   const sendAPIReq = async () => {
+    setLoading(true);
     try {
       const response = await axios.get("/homepage/scroller");
       console.log("back from scoller function");
@@ -37,12 +69,23 @@ function Scroller({ setListScreen, mediaData }: Props) {
         );
       });
       // console.log(response.data.results);
-
+      if (user) {
+        const userLists = await axios.post("/user/list", { user: user });
+        console.log(userLists);
+        userLists.data.listData.forEach((list: media) => {
+          if (list.mediaType === "Movie") {
+            list.media.forEach((movie: Movie) => {
+              movieLists.current.add(movie.id);
+            });
+          }
+        });
+      }
+      console.log(movieLists.current);
       const movieTitles = movies.map((movie: Movie) => {
         return movie.original_title;
       });
       // console.log(movieTitles);
-      setLoading(true);
+
       for (var i = 0; i < movieTitles.length; i++) {
         movieTitles[i] = movieTitles[i]
           .trim()
@@ -72,18 +115,103 @@ function Scroller({ setListScreen, mediaData }: Props) {
       }, {});
 
       // console.log(scoreDictTemp);
+
+      console.log("setting up the bookmark stuff");
+      if (movieLists.current.size != 0) {
+        for (let variable of movies) {
+          // console.log("inside the loop");
+          // console.log(bookmarkedLists.current);
+          if (movieLists.current.has(variable.id)) {
+            bookmarkedLists.current = [...bookmarkedLists.current, 1];
+          } else {
+            bookmarkedLists.current = [...bookmarkedLists.current, 0];
+          }
+        }
+      }
+
+      // console.log(bookmarkedArray);
+      // setBookmarkedLists(bookmarkedArray);
       setScoresDict(scoreDictTemp);
       setMovieData(movies);
       setLoading(false);
+      // setReRenderBookmark(true);
+
+      // if (user) {
+      //   try {
+      //     console.log("in the checklists try block");
+      //     const joeSchmo = await checkLists(movies);
+      //     if (joeSchmo) {
+      //       setBookmarkedLists(joeSchmo); // Only update state if joeSchmo is not undefined
+      //       // console.log(joeSchmo);
+      //     } else {
+      //       setBookmarkedLists([]); // Set to empty or some default state if undefined
+      //     }
+      //   } catch (error) {
+      //     console.log("failed to get info");
+      //     console.log(error);
+      //   }
+
+      // setBookmarkedLists(joeSchmo);
+      // console.log(bookmarkedLists);
+      // const userLists = await axios.post("/user/list", { user: user });
+      // console.log(userLists.data.listData);
+      // for (var i = 0; i < movies.length; i++) {
+      //   userLists.data.listData.forEach((list: media) => {
+      //     if (list.mediaType === "Movie") {
+      //       list.media.forEach((listMovieData: Movie) => {
+      //         if (listMovieData.id == movies[i].id) {
+      //           bookmarkedLists.push("1");
+      //         } else {
+      //         }
+      //       });
+      //     }
+      //   });
+      // }
+      // }
     } catch (error) {
+      console.log(error);
       console.log("failed to get info");
       //   console.log(error);
     }
   };
+  // const checkLists = async (movies: any[]) => {
+  //   try {
+  //     const userLists = await axios.post("/user/list", { user: user });
+  //     const movieIdsSet = new Set();
+
+  //     // Collect all movie IDs from user's lists into a set for quick lookup
+  //     userLists.data.listData.forEach((list: media) => {
+  //       if (list.mediaType === "Movie") {
+  //         list.media.forEach((movie: Movie) => {
+  //           movieIdsSet.add(movie.id);
+  //         });
+  //       }
+  //     });
+
+  //     // Array to hold the bookmark status of each movie
+  //     const bookmarkedLists = movies.map((movie) => {
+  //       return movieIdsSet.has(movie.id) ? 1 : 0;
+  //     });
+
+  //     console.log(bookmarkedLists);
+  //     return bookmarkedLists;
+  //   } catch (error) {
+  //     console.error("Error processing movies:", error);
+  //     return [];
+  //   }
+  // };
   const handleClickBookmark = (movie: Movie) => {
-    setListScreen(true);
-    console.log(movie);
-    mediaData.current = movie;
+    console.log(movieLists.current);
+    if (user) {
+      console.log(movie.id);
+      if (movieLists.current.has(movie.id)) {
+        navigate("/MyList");
+      } else {
+        setListScreen(true);
+        console.log(movie);
+        mediaData.current = movie;
+      }
+    }
   };
   const handlePosterClick = (movie: Movie) => {
     navigate(`/${movie.original_title ? "movie" : "tv"}/${movie.id}`);
@@ -102,7 +230,7 @@ function Scroller({ setListScreen, mediaData }: Props) {
         ) : (
           <>
             <div className="scroller ">
-              {movieData.map((movie) => (
+              {movieData.map((movie, i) => (
                 <div key={movie.id} className="movie-poster-container mr-10">
                   <img
                     onClick={() => {
@@ -124,18 +252,35 @@ function Scroller({ setListScreen, mediaData }: Props) {
                         ? scoresDict[movie.original_title]
                         : "Not Available"}
                     </p>
-                    <PiBookmarkSimple
-                      onClick={() => {
-                        handleClickBookmark(movie);
-                      }}
-                      className="size-9 absolute mt-56 bookmark-icon curso"
-                    />
+                    {/* {bookmarkedLists[i] === 1 ? (
+                      <PiBookmarkSimpleFill
+                        onClick={() => {
+                          handleClickBookmarkDelete(movie);
+                        }}
+                        className="size-9 absolute mt-56 bookmark-icon cursor-pointer"
+                      />
+                    ) : (
+                      <PiBookmarkSimple
+                        onClick={() => {
+                          handleClickBookmark(movie);
+                        }}
+                        className="size-9 absolute mt-56 bookmark-icon cursor-pointer"
+                      />
+                    )} */}
+
+                    <BookMarkMiddleMan
+                      movie={movie}
+                      rerenderBookmark={rerenderBookmark}
+                      onClick={() => handleClickBookmark(movie)}
+                      fill={bookmarkedLists.current[i]}
+                      mediaData={mediaData}
+                    ></BookMarkMiddleMan>
                   </div>
                 </div>
               ))}
             </div>
             <div className="scroller">
-              {movieData.map((movie) => (
+              {movieData.map((movie, i) => (
                 <div key={movie.id} className="movie-poster-container mr-10">
                   <img
                     onClick={() => {
@@ -157,10 +302,14 @@ function Scroller({ setListScreen, mediaData }: Props) {
                         ? scoresDict[movie.original_title]
                         : "Not Available"}
                     </p>
-                    <PiBookmarkSimple
+                    {/* <PiBookmarkSimple
                       onClick={() => handleClickBookmark(movie)}
                       className="size-9 absolute mt-56 bookmark-icon curso"
-                    />
+                    /> */}
+                    <BookMarkMiddleMan
+                      fill={bookmarkedLists.current[i]}
+                      mediaData={mediaData}
+                    ></BookMarkMiddleMan>
                   </div>
                 </div>
               ))}

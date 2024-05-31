@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LoginContext } from "../userContext";
 import SearchBar from "./SearchBar";
@@ -17,6 +17,9 @@ function NavBarLoggedIn() {
       navigate("/");
     });
   };
+  useEffect(() => {
+    console.log("user has been updated");
+  }, [user]);
   console.log("This is what is stored in user");
   console.log(user);
   return (
@@ -50,12 +53,10 @@ function NavBarLoggedIn() {
         <button className="navBar roboto-bold hidden xl:inline-block">
           Books
         </button>
-        {user ? (
+        {user && (
           <button className="navBar roboto-bold hidden lg:inline-block">
             My Lists
           </button>
-        ) : (
-          <></>
         )}
         {user ? (
           <button className="navBar roboto-bold" onClick={handleLogout}>
