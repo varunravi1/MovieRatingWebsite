@@ -17,10 +17,11 @@ function HomePage() {
   const { user, updateUser } = useContext(LoginContext);
   const [listScreen, setListScreen] = useState(false);
   const [rerenderBookmark, setrerenderBookmark] = useState(false);
-  let mediaData = useRef<Movie | null>(null);
+  const mediaData = useRef<Movie | null>(null);
+  console.log(user);
   return (
     <>
-      <div className="main-container shadow-lg">
+      <div className="main-container shadow-lg min-h-svh">
         <NavBarLoggedIn />
         <div className="mt-8">
           <SearchBar></SearchBar>
@@ -44,6 +45,7 @@ function HomePage() {
           ></PopUpLists>
         )}
       </div>
+      <div className="footer"> HELLO</div>
     </>
   );
 }

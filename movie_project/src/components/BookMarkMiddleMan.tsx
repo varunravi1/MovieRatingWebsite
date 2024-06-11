@@ -24,9 +24,6 @@ function BookMarkMiddleMan({
 }: Props) {
   const [localFill, setLocalFill] = useState(fill);
   useEffect(() => {
-    // console.log("inside bookmarkmiddleman");
-    // console.log(movie);
-    // console.log(mediaData.current);
     if (movie === mediaData.current) {
       setLocalFill(fill === 1 ? 0 : 1);
     }
@@ -40,7 +37,7 @@ function BookMarkMiddleMan({
         />
       ) : (
         <PiBookmarkSimple
-          className="size-9 absolute mt-56 bookmark-icon cursor-pointer"
+          className="size-9 absolute mt-56 bookmark-icon cursor-pointer "
           onClick={onClick}
         />
       )}

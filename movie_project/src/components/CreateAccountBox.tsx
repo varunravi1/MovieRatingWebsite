@@ -61,7 +61,7 @@ function CreateAccountBox({ onFlip }: Props) {
         // console.log(response.data.accessToken);
         localStorage.setItem("accessToken", response.data.accessToken);
         updateUser(userData.email);
-        navigate("/HomePage");
+        navigate("/");
         //console.log(response);
         //print response to server
       } catch (error) {
@@ -106,12 +106,12 @@ function CreateAccountBox({ onFlip }: Props) {
   };
   return (
     <>
-      <div className="flex items-end justify-center h-screen bg-transparent mt-20">
+      <div className="flex items-center justify-center h-screen bg-transparent mt-20">
         <div className="relative z-0 w-full max-w-xs shadow-sm">
           <form
             onSubmit={handleSubmit}
             action=""
-            className="bg-transparent shadow-xl rounded-md px-10 pt-6 pb-8 mb-4"
+            className="bg-comp-black shadow-xl rounded-md px-10 pt-6 pb-8 mb-4"
           >
             <div className="mb-4">
               <label

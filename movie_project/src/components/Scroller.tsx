@@ -45,6 +45,7 @@ function Scroller({
   // const bookmarkedArray: (0 | 1)[] = [];
   // let bookmarkedLists: (0 | 1)[] | undefined;
   useEffect(() => {
+    console.log(isAuthLoading);
     if (!isAuthLoading) {
       sendAPIReq();
     }
@@ -135,72 +136,13 @@ function Scroller({
       setMovieData(movies);
       setLoading(false);
       // setReRenderBookmark(true);
-
-      // if (user) {
-      //   try {
-      //     console.log("in the checklists try block");
-      //     const joeSchmo = await checkLists(movies);
-      //     if (joeSchmo) {
-      //       setBookmarkedLists(joeSchmo); // Only update state if joeSchmo is not undefined
-      //       // console.log(joeSchmo);
-      //     } else {
-      //       setBookmarkedLists([]); // Set to empty or some default state if undefined
-      //     }
-      //   } catch (error) {
-      //     console.log("failed to get info");
-      //     console.log(error);
-      //   }
-
-      // setBookmarkedLists(joeSchmo);
-      // console.log(bookmarkedLists);
-      // const userLists = await axios.post("/user/list", { user: user });
-      // console.log(userLists.data.listData);
-      // for (var i = 0; i < movies.length; i++) {
-      //   userLists.data.listData.forEach((list: media) => {
-      //     if (list.mediaType === "Movie") {
-      //       list.media.forEach((listMovieData: Movie) => {
-      //         if (listMovieData.id == movies[i].id) {
-      //           bookmarkedLists.push("1");
-      //         } else {
-      //         }
-      //       });
-      //     }
-      //   });
-      // }
-      // }
     } catch (error) {
       console.log(error);
       console.log("failed to get info");
       //   console.log(error);
     }
   };
-  // const checkLists = async (movies: any[]) => {
-  //   try {
-  //     const userLists = await axios.post("/user/list", { user: user });
-  //     const movieIdsSet = new Set();
-
-  //     // Collect all movie IDs from user's lists into a set for quick lookup
-  //     userLists.data.listData.forEach((list: media) => {
-  //       if (list.mediaType === "Movie") {
-  //         list.media.forEach((movie: Movie) => {
-  //           movieIdsSet.add(movie.id);
-  //         });
-  //       }
-  //     });
-
-  //     // Array to hold the bookmark status of each movie
-  //     const bookmarkedLists = movies.map((movie) => {
-  //       return movieIdsSet.has(movie.id) ? 1 : 0;
-  //     });
-
-  //     console.log(bookmarkedLists);
-  //     return bookmarkedLists;
-  //   } catch (error) {
-  //     console.error("Error processing movies:", error);
-  //     return [];
-  //   }
-  // };
-  const handleClickBookmark = (movie: Movie) => {
+  const handleClickBookmark = async (movie: Movie) => {
     console.log(movieLists.current);
     if (user) {
       console.log(movie.id);

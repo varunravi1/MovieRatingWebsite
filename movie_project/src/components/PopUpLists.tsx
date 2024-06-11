@@ -9,6 +9,8 @@ interface Props {
   mediaData: React.MutableRefObject<Movie | null>;
   setrerenderBookmark: (variable: boolean) => void;
   rerenderBookmark: boolean;
+  // setrerenderListScreen: (variable: boolean) => void;
+  // rerenderListScreen: boolean;
 }
 interface Movie {
   id: number;
@@ -32,7 +34,6 @@ function PopUpLists({
   const { user } = useContext(LoginContext);
   const [listData, setListData] = useState<any[] | null>([]);
   const [createList, setcreateList] = useState(false);
-  const [listPage, setlistPage] = useState(false);
   const [mediaType, setMediaType] = useState("Movie");
   const [title, setTitle] = useState("");
   useEffect(() => {
@@ -108,7 +109,7 @@ function PopUpLists({
                 {listData?.map((list: media) => (
                   <div className="" key={list._id}>
                     <div
-                      className="roboto-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-plat hover:text-yt-black active:scale-95 active:ring-4 ring-purp overflow-auto"
+                      className="roboto-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-black-hover active:scale-95 active:ring-4 ring-purp overflow-auto"
                       onClick={() => {
                         handleAddtoList(list);
                       }}
@@ -120,7 +121,7 @@ function PopUpLists({
               </div>
 
               <div
-                className="ml-8 flex items-center w-40 space-x-4 cursor-pointer bg-yt-black py-2 rounded-xl hover:bg-plat hover:text-yt-black pop-up-lists"
+                className="ml-8 flex items-center w-40 space-x-4 cursor-pointer bg-yt-black py-2 rounded-xl hover:bg-another-black pop-up-lists"
                 tabIndex={0}
                 id="create-list-button"
                 onClick={() => {

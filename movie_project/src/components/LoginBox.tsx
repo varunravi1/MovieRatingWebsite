@@ -30,7 +30,7 @@ function LoginBox({ onFlip }: Props) {
       // console.log(response);
       console.log("Re-Logged In");
       updateUser(userLogin.login);
-      navigate("/HomePage");
+      navigate("/");
 
       console.log(response);
     } catch (error: any) {
@@ -47,7 +47,7 @@ function LoginBox({ onFlip }: Props) {
             setAuthToken(localStorage.getItem("accessToken"));
             console.log("Successfully generated new access token");
             updateUser(userLogin.login);
-            navigate("/HomePage");
+            navigate("/");
           });
         } catch (error) {
           console.log("Invalid Credentials");
@@ -63,12 +63,12 @@ function LoginBox({ onFlip }: Props) {
   };
   return (
     <>
-      <div className="flex items-end justify-center h-screen bg-transparent">
+      <div className="flex items-center justify-center h-screen bg-transparent">
         <div className="relative z-0 w-full max-w-xs shadow-sm">
           <form
             onSubmit={submitHandler}
             action=""
-            className="bg-transparent shadow-xl rounded-md px-10 pt-6 pb-8 mb-4"
+            className="bg-comp-black shadow-xl rounded-md px-10 pt-6 pb-8 mb-4"
           >
             <div className="mb-4">
               <label
@@ -135,7 +135,7 @@ function LoginBox({ onFlip }: Props) {
               <button
                 type="button"
                 onClick={() => {
-                  navigate("/HomePage");
+                  navigate("/");
                 }}
                 className="bg-transparent px-4 py-2 rounded-lg text-plat font-bold hover:bg-plat hover:text-yt-black transition-all"
               >

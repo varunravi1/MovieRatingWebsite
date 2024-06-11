@@ -5,26 +5,31 @@ import { LoginContext } from "../userContext";
 import SearchBar from "./SearchBar";
 import { ImCancelCircle } from "react-icons/im";
 import FlipLogin from "./FlipLogin";
+import { IoIosSettings } from "react-icons/io";
+import UserMenu from "./UserMenu";
 function NavBarLoggedIn() {
   const { user, updateUser } = useContext(LoginContext);
   const [signUp, setSignUp] = useState(false);
+  const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
   const handleLogout = () => {
     axios.delete("/refresh_token").then((response) => {
       console.log(response);
       console.log("Successfully deleted refresh token and logged out");
+      setMenu(false);
       updateUser(null);
       navigate("/");
     });
   };
   useEffect(() => {
     console.log("user has been updated");
+    setSignUp(false);
   }, [user]);
   console.log("This is what is stored in user");
   console.log(user);
   return (
     <>
-      {signUp ? (
+      {signUp && (
         <div className=" bg-yt-black bg-opacity-70 fixed top-0 left-0 flex w-svw h-svh z-50">
           <FlipLogin></FlipLogin>
           <ImCancelCircle
@@ -36,12 +41,10 @@ function NavBarLoggedIn() {
             color="#FFF"
           />
         </div>
-      ) : (
-        <></>
       )}
 
-      <div className="fixed-bar flex justify-between px-5">
-        <Link to={"/HomePage"} className="navBar roboto-bold">
+      <div className=" fixed-bar flex justify-between px-5">
+        <Link to={"/"} className="navBar roboto-bold">
           Home
         </Link>
         <button className="navBar roboto-bold hidden sm:inline-block">
@@ -53,16 +56,31 @@ function NavBarLoggedIn() {
         <button className="navBar roboto-bold hidden xl:inline-block">
           Books
         </button>
-        {user && (
+        {/* {user && (
           <button className="navBar roboto-bold hidden lg:inline-block">
             My Lists
           </button>
-        )}
+        )} */}
         {user ? (
-          <button className="navBar roboto-bold" onClick={handleLogout}>
-            Logout
-          </button>
+          <div className="relative">
+            <IoIosSettings
+              size={30}
+              className="navBar bg-white cursor-pointer hover:rotate-90 transition-all hover:scale-110"
+              onClick={() => {
+                setMenu(!menu);
+              }}
+            />
+            {menu && (
+              <div className="absolute top-9 right-4 z-50">
+                <UserMenu onClick={handleLogout} />
+              </div>
+            )}
+          </div>
         ) : (
+          // <button className="navBar roboto-bold" onClick={handleLogout}>
+          //   Logout
+          // </button>
+
           <>
             <button
               className="navBar roboto-bold"
@@ -70,7 +88,7 @@ function NavBarLoggedIn() {
                 setSignUp(true);
               }}
             >
-              Sign Up
+              Sign In
             </button>
           </>
         )}

@@ -14,6 +14,9 @@ export default {
         purp: "#4F359B",
         "comp-black": "#1c1c1c",
         "purp-light": "#6344bf",
+        "very-light-black": "#444444",
+        "black-hover": "#343434",
+        "another-black": "#323232",
       },
       backgroundImage: {
         parallax: 'url("public/bg-again.jpg")',

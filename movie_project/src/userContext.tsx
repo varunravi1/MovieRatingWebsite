@@ -28,6 +28,9 @@ function UserContext({ children }: children) {
   const [user, updateUser] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   useEffect(() => {
+    setAuthToken(localStorage.getItem("accessToken"));
+    console.log("UserContext useeffect is running rn");
+    providerFunc();
     const interval = setInterval(async () => {
       setAuthToken(localStorage.getItem("accessToken"));
       console.log("UserContext useeffect is running rn");
@@ -37,50 +40,11 @@ function UserContext({ children }: children) {
       if (timeLeft.data < 5) {
         providerFunc();
       }
-      // console.log(localStorage.getItem("accessToken"));
-      // if (user == null) {
-      //
-      // }
     }, 450000);
-    return () => clearInterval(interval);
-    // if (user == null) {
-    //   providerFunc();
-    // axios
-    //   .get("/user")
-    //   .then((response) => {
-    //     console.log("THIS IS THE RESPONSE FROM THE AUTHENTICATION ENDPOINT");
-    //     // console.log(response.data.userAuthentication);
-    //     updateUser(response.data.userAuthentication);
-    //     // console.log(user);
-    //     //   navigate("/HomePage");
-    //   })
-    //   .catch(async (error: any) => {
-    //     console.log("Access Token is not valid");
-    //     //console.log(error.respons || error); //DISPLAYING THE ERROR
-
-    //     if (error.response && error.response.status === 403) {
-    //       console.log(
-    //         "Token is Expired - Trying to create a new one with refresh token"
-    //       );
-    //       try {
-    //         axios.get("/refresh_token").then((response) => {
-    //           localStorage.setItem("accessToken", response.data.accessToken);
-    //           setAuthToken(localStorage.getItem("accessToken"));
-    //           console.log("Successfully generated new access token");
-    //           console.log(response.data.userAuthentication);
-    //           // console.log(response.data.user.email);
-
-    //           updateUser(response.data.userAuthentication);
-    //           // navigate("/HomePage");
-    //         });
-    //       } catch (error) {
-    //         console.log("error");
-    //       }
-    //     } else {
-    //       console.log("confused");
-    //     }
-    //   });
-    // }
+    return () => {
+      clearInterval(interval);
+      setIsAuthLoading(false);
+    };
   }, []);
 
   const providerFunc = async () => {
