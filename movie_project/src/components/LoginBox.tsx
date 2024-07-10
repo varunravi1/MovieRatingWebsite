@@ -30,6 +30,8 @@ function LoginBox({ onFlip }: Props) {
       // console.log(response);
       console.log("Re-Logged In");
       updateUser(userLogin.login);
+      localStorage.setItem("accessToken", response.data.accessToken);
+      setAuthToken(localStorage.getItem("accessToken"));
       navigate("/");
 
       console.log(response);

@@ -15,6 +15,7 @@ function NavBarLoggedIn() {
   const handleLogout = () => {
     axios.delete("/refresh_token").then((response) => {
       console.log(response);
+      localStorage.setItem("accessToken", "");
       console.log("Successfully deleted refresh token and logged out");
       setMenu(false);
       updateUser(null);
@@ -25,8 +26,6 @@ function NavBarLoggedIn() {
     console.log("user has been updated");
     setSignUp(false);
   }, [user]);
-  console.log("This is what is stored in user");
-  console.log(user);
   return (
     <>
       {signUp && (
@@ -54,7 +53,7 @@ function NavBarLoggedIn() {
           TV Shows
         </button>
         <button className="navBar roboto-bold hidden xl:inline-block">
-          Books
+          Moviedle
         </button>
         {/* {user && (
           <button className="navBar roboto-bold hidden lg:inline-block">

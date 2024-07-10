@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { LoginContext } from "../userContext";
 import { PiBookmarkSimple, PiBookmarkSimpleFill } from "react-icons/pi";
 interface Movie {
   id: number;
@@ -22,8 +23,10 @@ function BookMarkMiddleMan({
   rerenderBookmark,
   movie,
 }: Props) {
+  const { user } = useContext(LoginContext);
   const [localFill, setLocalFill] = useState(fill);
   useEffect(() => {
+    console.log("re-rendering bookmark");
     if (movie === mediaData.current) {
       setLocalFill(fill === 1 ? 0 : 1);
     }

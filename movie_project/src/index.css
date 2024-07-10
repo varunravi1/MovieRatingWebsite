@@ -142,3 +142,15 @@ body {
 .pop-up-lists:active {
   transform: scale(0.95);
 }
+.overlay-container {
+  position: fixed; /* Positioned relative to the viewport */
+  top: 0; /* Start from the top edge of the viewport */
+  left: 0; /* Start from the left edge of the viewport */
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+  display: flex; /* Use flexbox for centering the iframe */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  z-index: 50; /* Ensure it's above other content */
+}

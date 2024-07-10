@@ -3,6 +3,8 @@ import axios from "axios";
 import debounce from "lodash.debounce";
 import { useNavigate } from "react-router-dom";
 import { BsSearch } from "react-icons/bs";
+import FlipLogin from "./FlipLogin";
+import { ImCancelCircle } from "react-icons/im";
 interface Movie {
   id: number;
   original_title: string;

@@ -41,36 +41,31 @@ function Scroller({
   const [listData, setListData] = useState<any[]>([]);
   const bookmarkedLists = useRef<(0 | 1)[]>([]);
   const movieLists = useRef(new Set());
-  // const movieLists = new Set();
-  // const bookmarkedArray: (0 | 1)[] = [];
-  // let bookmarkedLists: (0 | 1)[] | undefined;
   useEffect(() => {
     console.log(isAuthLoading);
     if (!isAuthLoading) {
       sendAPIReq();
     }
-  }, [isAuthLoading]);
+  }, [isAuthLoading, user]);
 
-  // useEffect(() => {
-  //   sendAPIReq();
-  //   console.log("in the listscreen refresh useEffect");
-  // }, [listScreen]);
   const sendAPIReq = async () => {
     setLoading(true);
     try {
       const response = await axios.get("/homepage/scroller");
       console.log("back from scoller function");
-      // console.log(response.data.results);
-      // console.log(response.data.results);
-
+      console.log(user);
       const movies = response.data.results.filter((movie: Movie) => {
+        const today = new Date();
+        const twoMonthsBefore = new Date(today.setMonth(today.getMonth() - 2));
         return (
-          new Date(movie.release_date) > new Date("2023-12-01") &&
+          new Date(movie.release_date) > twoMonthsBefore &&
           movie.original_language === "en"
         );
       });
+      console.log(movies.length);
       // console.log(response.data.results);
       if (user) {
+        console.log("getting the list items");
         const userLists = await axios.post("/user/list", { user: user });
         console.log(userLists);
         userLists.data.listData.forEach((list: media) => {
@@ -80,6 +75,8 @@ function Scroller({
             });
           }
         });
+      } else {
+        movieLists.current.clear();
       }
       console.log(movieLists.current);
       const movieTitles = movies.map((movie: Movie) => {
@@ -119,27 +116,26 @@ function Scroller({
 
       console.log("setting up the bookmark stuff");
       if (movieLists.current.size != 0) {
+        console.log("inside bookmark loop");
+        console.log(movieLists.current);
         for (let variable of movies) {
-          // console.log("inside the loop");
-          // console.log(bookmarkedLists.current);
           if (movieLists.current.has(variable.id)) {
+            console.log("list is in new releases");
             bookmarkedLists.current = [...bookmarkedLists.current, 1];
           } else {
             bookmarkedLists.current = [...bookmarkedLists.current, 0];
           }
         }
+        console.log(bookmarkedLists.current);
+      } else {
+        bookmarkedLists.current.fill(0);
       }
-
-      // console.log(bookmarkedArray);
-      // setBookmarkedLists(bookmarkedArray);
       setScoresDict(scoreDictTemp);
       setMovieData(movies);
       setLoading(false);
-      // setReRenderBookmark(true);
     } catch (error) {
       console.log(error);
       console.log("failed to get info");
-      //   console.log(error);
     }
   };
   const handleClickBookmark = async (movie: Movie) => {
@@ -194,22 +190,6 @@ function Scroller({
                         ? scoresDict[movie.original_title]
                         : "Not Available"}
                     </p>
-                    {/* {bookmarkedLists[i] === 1 ? (
-                      <PiBookmarkSimpleFill
-                        onClick={() => {
-                          handleClickBookmarkDelete(movie);
-                        }}
-                        className="size-9 absolute mt-56 bookmark-icon cursor-pointer"
-                      />
-                    ) : (
-                      <PiBookmarkSimple
-                        onClick={() => {
-                          handleClickBookmark(movie);
-                        }}
-                        className="size-9 absolute mt-56 bookmark-icon cursor-pointer"
-                      />
-                    )} */}
-
                     <BookMarkMiddleMan
                       movie={movie}
                       rerenderBookmark={rerenderBookmark}
@@ -249,6 +229,9 @@ function Scroller({
                       className="size-9 absolute mt-56 bookmark-icon curso"
                     /> */}
                     <BookMarkMiddleMan
+                      movie={movie}
+                      rerenderBookmark={rerenderBookmark}
+                      onClick={() => handleClickBookmark(movie)}
                       fill={bookmarkedLists.current[i]}
                       mediaData={mediaData}
                     ></BookMarkMiddleMan>

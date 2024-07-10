@@ -1,26 +1,38 @@
-import { useContext, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { LoginContext } from "../userContext";
 import axios from "axios";
 import { CgAdd } from "react-icons/cg";
 import { ImCancelCircle } from "react-icons/im";
 import { set } from "zod";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-interface Props {
-  setListScreen: (variable: boolean) => void;
-  mediaData: React.MutableRefObject<Movie | null>;
-  setrerenderBookmark: (variable: boolean) => void;
-  rerenderBookmark: boolean;
-  // setrerenderListScreen: (variable: boolean) => void;
-  // rerenderListScreen: boolean;
-}
 interface Movie {
   id: number;
   original_title: string;
   poster_path: string;
+  backdrop_path: string;
+  original_name: string;
+  overview: string;
+  genres: any[];
+  runtime: number;
   release_date: string;
   original_language: string;
+  adult: boolean;
+  cast: any[];
+  director: string;
+  trailer: {
+    key: string;
+  };
+  first_air_date: string;
+  last_air_date: string;
+  audienceScore: string;
+  criticScore: string;
+  status: string;
 }
 interface media {
   _id: string;
@@ -28,20 +40,20 @@ interface media {
   title: string;
   media: {};
 }
-function PopUpLists({
-  setListScreen,
-  mediaData,
-  rerenderBookmark,
-  setrerenderBookmark,
-}: Props) {
+interface Props {
+  tvormov: Movie;
+  setPopUpLists: Dispatch<SetStateAction<boolean>>;
+  setBookMarkValue: Dispatch<SetStateAction<boolean>>;
+}
+function PopUpLists2({ tvormov, setPopUpLists, setBookMarkValue }: Props) {
   const { user } = useContext(LoginContext);
   const [listData, setListData] = useState<any[] | null>([]);
   const [createList, setcreateList] = useState(false);
-  const [mediaType, setMediaType] = useState("Movie");
   const [title, setTitle] = useState("");
   useEffect(() => {
     getLists();
   }, []);
+  const mediaType = tvormov.original_title == null ? "TV" : "Movie";
 
   const getLists = async () => {
     try {
@@ -54,8 +66,6 @@ function PopUpLists({
     }
   };
   const handleCreateList = async () => {
-    console.log(mediaType);
-    console.log(title);
     try {
       const results = await axios.post("/user/list/add", {
         user: user,
@@ -64,38 +74,38 @@ function PopUpLists({
       });
       console.log(results);
       setcreateList(false);
+      setListData((prevListData) => {
+        return prevListData
+          ? [...prevListData, results.data.created]
+          : [results.data.created];
+      });
     } catch (error) {}
   };
   const handleAddtoList = async (list: media) => {
-    if (list.mediaType == "TV") {
-      toast.error(
-        "Cannot add a movie to a TV List!! Please try another or create a list!"
-      );
-    } else {
-      try {
-        console.log(mediaData.current);
-        const result = await axios.patch(`/user/list${list._id}`, {
-          user: user,
-          title: list.title,
-          action: "add",
-          mediaItem: mediaData.current,
-        });
-        console.log(result);
-        setListScreen(false);
-        setrerenderBookmark(!rerenderBookmark);
-      } catch (error) {}
+    try {
+      console.log(list._id);
+      console.log("Trying to add to list");
+      const response = await axios.patch(`/user/list${list._id}`, {
+        title: list.title,
+        user: user,
+        mediaItem: tvormov,
+        action: "add",
+      });
+      setPopUpLists(false);
+      setBookMarkValue(true);
+    } catch (error) {
+      console.log(error);
     }
   };
   return (
     <>
-      <ToastContainer />
       <div className="fixed flex items-center justify-center pop-up-lists-container w-svw h-svh top-0 left-0">
         <div className="absolute bg-dim-gray w-[700px] h-[400px]">
           <ImCancelCircle
             className="absolute top-0 right-0 mr-3 mt-4 cursor-pointer"
             size={20}
             onClick={() => {
-              setListScreen(false);
+              setPopUpLists(false);
             }}
           ></ImCancelCircle>
           <div className="ml-8 my-8 roboto-bold tracking-wide">Your Lists</div>
@@ -116,19 +126,25 @@ function PopUpLists({
           ) : (
             <>
               <div className=" max-h-56 overflow-auto mb-3">
-                {listData?.map((list: media) => (
-                  <div className="" key={list._id}>
-                    <div
-                      className=" flex items-center justify-between roboto-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-black-hover active:scale-95 active:ring-4 ring-purp overflow-auto"
-                      onClick={() => {
-                        handleAddtoList(list);
-                      }}
-                    >
-                      <div> {list.title}</div>
-                      <div> {list.mediaType}</div>
+                {listData
+                  ?.filter((list: media) => {
+                    console.log(mediaType);
+                    return mediaType == "Movie"
+                      ? list.mediaType == "Movie"
+                      : list.mediaType == "TV";
+                  })
+                  .map((list: media) => (
+                    <div className="" key={list._id}>
+                      <div
+                        className="roboto-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-black-hover active:scale-95 active:ring-4 ring-purp overflow-auto"
+                        onClick={() => {
+                          handleAddtoList(list);
+                        }}
+                      >
+                        {list.title}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
 
               <div
@@ -174,11 +190,12 @@ function PopUpLists({
               <select
                 id="media-type"
                 className="form-select w-full px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yt-black focus:border-transparent text-gray-800"
-                value={mediaType}
-                onChange={(event) => setMediaType(event.target.value)} // Handle change to update state
               >
-                <option value="Movie">Movie</option>
-                <option value="TV">TV</option>
+                {tvormov.original_title ? (
+                  <option value="Movie">Movie</option>
+                ) : (
+                  <option value="TV">TV</option>
+                )}
               </select>
             </div>
 
@@ -199,4 +216,4 @@ function PopUpLists({
   );
 }
 
-export default PopUpLists;
+export default PopUpLists2;

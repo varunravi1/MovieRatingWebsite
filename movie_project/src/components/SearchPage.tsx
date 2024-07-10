@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "../SearchPage.css";
 import NavBarLoggedIn from "./NavBarLoggedIn";
 import { FaPlay } from "react-icons/fa6";
-import { PiBookmarkSimple } from "react-icons/pi";
+import { PiBookmarkSimple, PiBookmarkSimpleFill } from "react-icons/pi";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { ImCancelCircle } from "react-icons/im";
 import axios from "axios";
 import { infinity } from "ldrs";
+import Comments from "./Comments";
+import PopUpLists2 from "./PopUpLists2";
+import { Divider } from "@material-ui/core";
+import { LoginContext } from "../userContext";
 interface Movie {
   id: number;
   original_title: string;
@@ -33,6 +37,10 @@ interface Movie {
 }
 infinity.register();
 function SearchPage() {
+  const navigate = useNavigate();
+  const [popupList, setPopUpList] = useState(false);
+  const [bookmarkValue, setBookMarkValue] = useState(false);
+  const { user } = useContext(LoginContext);
   const parameters = useParams();
   const mediaType = parameters.type;
   const id = parameters.id;
@@ -43,6 +51,29 @@ function SearchPage() {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    if (movieData) {
+      getLists();
+    }
+  }, [movieData]);
+  const getLists = async () => {
+    try {
+      const results = await axios.post("/user/list", { user: user });
+      const listData = results.data.listData;
+
+      for (var i = 0; i < listData.length; i++) {
+        var list = listData[i].media;
+        for (var j = 0; j < list.length; j++) {
+          if (list[j].id === movieData?.id) {
+            setBookMarkValue(true);
+            return; // Exit the function once the movie is found in the lists
+          }
+        }
+      }
+    } catch (error) {}
+  };
+
   const getData = async () => {
     const result = await axios.post("/searchMedia", {
       type: mediaType,
@@ -51,7 +82,6 @@ function SearchPage() {
     if (mediaType === "tv") {
       setisMovie(false);
     }
-    console.log(result);
 
     const score =
       mediaType === "tv"
@@ -153,10 +183,19 @@ function SearchPage() {
                   </button>
                 </div>
               }
-              <PiBookmarkSimple
-                size={40}
-                className="absolute top-4 right-4 cursor-pointer transition-all hover:scale-125"
-              ></PiBookmarkSimple>
+              {!bookmarkValue ? (
+                <PiBookmarkSimple
+                  onClick={() => setPopUpList(true)}
+                  size={40}
+                  className="absolute top-4 right-4 cursor-pointer transition-all hover:scale-125"
+                ></PiBookmarkSimple>
+              ) : (
+                <PiBookmarkSimpleFill
+                  onClick={() => navigate("/MyList")}
+                  size={40}
+                  className="absolute top-4 right-4 cursor-pointer transition-all hover:scale-125"
+                ></PiBookmarkSimpleFill>
+              )}
             </div>
             <hr className="my-5 border-gray-400"></hr>
             <div className="flex space-x-4 pb-6">
@@ -178,12 +217,6 @@ function SearchPage() {
                         " | " +
                         movieData?.director}
                   </p>
-                  <div className="bg-plat rounded-3xl flex items-center pl-2 buttons ml-6 mb-2">
-                    <IoIosAddCircleOutline color="#121212" />
-                    <button className="px-3 roboto-regular tracking-wide text-yt-black">
-                      Add to List
-                    </button>
-                  </div>
                 </div>
 
                 <p className="roboto-regular mb-6">{movieData?.overview}</p>
@@ -227,7 +260,17 @@ function SearchPage() {
                   ))}
               </div>
             </div>
+            <Comments movie={movieData}></Comments>
           </div>
+          {popupList && user && (
+            <div>
+              <PopUpLists2
+                tvormov={movieData}
+                setPopUpLists={setPopUpList}
+                setBookMarkValue={setBookMarkValue}
+              />
+            </div>
+          )}
           <footer className="footer">© 2024 Your Site Name</footer>
         </div>
       ) : (

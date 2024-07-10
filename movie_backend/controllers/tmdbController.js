@@ -16,19 +16,6 @@ const requestScroller = async (req, res) => {
       return res.json(JSON.parse(data));
     } else {
       console.log("cache missed");
-      // const [response1, response2] = await Promise.all([
-      //   axios.get(
-      //     `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
-      //       "2024-03-01"
-      //     )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&page=1`
-      //   ),
-      //   axios.get(
-      //     `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
-      //       "2024-03-01"
-      //     )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&page=2`
-      //   ),
-      // ]);
-      // const combinedResults = [...response1.data, ...response2.data];
       const response1 = await axios.get(
         `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
           "2024-03-01"
@@ -44,12 +31,7 @@ const requestScroller = async (req, res) => {
         ...response1.data, // This spreads the first response object properties
         results: [...response1.data.results, ...response2.data.results], // This specifically combines the results arrays
       };
-      // console.log(combinedResults);
-      // console.log("TYPE OF RESPONSE");
-      // console.log(typeof response1.data);
       res.json(combinedResults);
-      //   console.log(JSON.stringify(response.data));
-      //   console.log(response.data);
       req.redisClient.set("new-release", JSON.stringify(combinedResults), {
         EX: WEEK_EXPIRATION,
       });
@@ -57,6 +39,12 @@ const requestScroller = async (req, res) => {
   } catch (error) {
     console.log("Something went wrong with api request");
     res.status(404).json({ error: "invalid request" });
+  }
+};
+const logStringDetails = (str) => {
+  console.log(`String: "${str}"`);
+  for (let i = 0; i < str.length; i++) {
+    console.log(`Character: "${str[i]}", ASCII: ${str.charCodeAt(i)}`);
   }
 };
 const searchRottenTomatoes = async (title, date) => {
@@ -68,9 +56,6 @@ const searchRottenTomatoes = async (title, date) => {
 
   const year = date.split("-")[0];
   console.log(searchUrl, year);
-  console.log(year - 1);
-  //   console.log(searchUrl);
-  //   console.log(year);
   let resultTitle,
     resultYear = "";
   try {
@@ -84,13 +69,20 @@ const searchRottenTomatoes = async (title, date) => {
       console.log("Inside the then block");
       resultTitle = $(element).find('a[data-qa="info-name"]').text().trim();
       console.log("this is result title");
-      console.log(resultTitle);
+      console.log(resultTitle.trim().toLowerCase());
+      console.log("This is the movie we are looking for");
+      console.log(title.trim().toLowerCase());
+      console.log(
+        resultTitle.trim().replace(/\s+/g, " ").toLowerCase() ==
+          title.trim().replace(/\s+/g, " ").toLowerCase()
+      );
       resultYear = $(element).attr("releaseyear");
 
       console.log("This is result year");
       console.log(resultYear);
       if (
-        (resultTitle.toLowerCase() === title.toLowerCase() &&
+        (resultTitle.trim().replace(/\s+/g, " ").toLowerCase() ===
+          title.trim().replace(/\s+/g, " ").toLowerCase() &&
           resultYear === year) ||
         (resultTitle.toLowerCase() === title.toLowerCase() &&
           resultYear === (year - 1).toString())
@@ -98,7 +90,6 @@ const searchRottenTomatoes = async (title, date) => {
         console.log("checking if the date and name matches");
         matchingHref = $(element).find('a[data-qa="info-name"]').attr("href");
         matchingHref = matchingHref.split("/m/")[1];
-        // matchingHref = matchingHref.replace(/_\d{4}$/, "");
         console.log(matchingHref);
         found = true;
         return false; // Break the loop
@@ -134,15 +125,6 @@ const searchForScores = async (url, date) => {
     console.log(criticsScore);
     console.log(audienceScore);
     const urlwithoutDate = url.replace(/_\d{4}$/, "");
-    // const score = await ScoreSchema.create({
-    //   title: urlwithoutDate,
-    //   date: date,
-    //   criticScore: criticsScore,
-    //   audienceScore: audienceScore,
-    // }).catch((error) => {
-    //   console.log("error creating movie to store in db");
-    //   console.log(error);
-    // });
     return {
       criticScore: criticsScore || "Not found",
       audienceScore: audienceScore || "Not found",
@@ -181,27 +163,6 @@ const scraper = async (req, res) => {
         title: req.body.url,
         date: year,
       });
-      // if (check) {
-      //   console.log("FOUND THE MOVIE IN DB");
-      //   await req.redisClient.set(
-      //     `rt-audienceScore-${req.body.url}`,
-      //     JSON.stringify(check.audienceScore),
-      //     {
-      //       EX: WEEK_EXPIRATION,
-      //     }
-      //   );
-      //   await req.redisClient.set(
-      //     `rt-criticScore-${req.body.url}`,
-      //     JSON.stringify(check.criticScore),
-      //     {
-      //       EX: WEEK_EXPIRATION,
-      //     }
-      //   );
-      //   res.json({
-      //     criticScore: check.criticScore,
-      //     audienceScore: check.audienceScore,
-      //   });
-      // } else {
       const underscores = countUnderscores(req.body.url);
       if (underscores > 3) {
         await delay(Math.random() * 2000);
@@ -276,7 +237,7 @@ const scraper = async (req, res) => {
               res.staus(500).json({ err: error });
             });
         } else {
-          res.status(401).json({ err: "Not found" });
+          res.json({ error: "unavailable on rotten tomatoes." });
         }
       }
       //}
@@ -306,14 +267,7 @@ const searchFunc = async (req, res) => {
         )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&language=en-US`
       ),
     ]);
-    // console.log(responseShow.data);
-    // const response = await axios.get(
-    //   `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
-    //     searchQuery
-    //   )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&language=en-US`
-    // );
     res.json({ movies: responseMovie.data, tv: responseShow.data });
-    // console.log(response.data);
   } catch (error) {
     console.log("Failed to get data from api");
     console.error(error);

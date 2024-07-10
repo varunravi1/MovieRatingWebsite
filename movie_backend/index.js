@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const nonUserRoutes = require("./routes/nonUserRoutes");
 const searchRoutes = require("./routes/searchRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 const Redis = require("redis");
 const redisClient = Redis.createClient();
 redisClient.on("error", (err) => {
@@ -27,7 +28,10 @@ connectRedis();
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log("Database Connected"))
-  .catch((err) => console.log("Database not connected."));
+  .catch((err) => {
+    console.log("Database not connected.");
+    console.log(err);
+  });
 
 //middleware
 app.use(express.json());
@@ -42,3 +46,4 @@ app.use("/", authRoutes); //uses authRoutes to handle requests to the route in t
 app.use("/user", userRoutes);
 app.use("/homepage", nonUserRoutes);
 app.use("/searchMedia", searchRoutes);
+app.use("/comments", commentRoutes);

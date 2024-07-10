@@ -126,8 +126,10 @@ const loginUser = async (req, res) => {
             }
           });
         } else {
-          console.log("No Token provided");
-          res.status(500).json({ message: "No token provided" });
+          console.log("No Token provided ");
+          const accessToken = issueToken(login);
+          res.json({ accessToken: accessToken, login: login });
+          // res.status(500).json({ message: "No token provided" });
         }
       } else {
         return res.status(401).json({ err: "Passwords do not match" });

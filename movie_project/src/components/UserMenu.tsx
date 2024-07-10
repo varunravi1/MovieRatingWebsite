@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { MdFormatListBulleted } from "react-icons/md";
 import { IoLogOutOutline } from "react-icons/io5";
 import { IoIosSettings } from "react-icons/io";
+import { FaRegUser } from "react-icons/fa6";
 interface Props {
   onClick: () => void;
 }
@@ -14,7 +15,7 @@ function UserMenu({ onClick }: Props) {
   const { user, updateUser } = useContext(LoginContext);
   return (
     <>
-      <div className="w-80 h-80 rounded-3xl bg-dim-gray text-plat flex flex-col">
+      <div className="w-80 rounded-3xl bg-dim-gray text-plat flex flex-col">
         <div className="pl-3 pt-3 h-10 rounded-xl flex justify-center items-center">
           <div>{user}</div>
         </div>
@@ -35,6 +36,10 @@ function UserMenu({ onClick }: Props) {
             className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover"
             onClick={onClick}
           >
+            <FaRegUser size={28} className=" mr-3" />
+            Profile
+          </div>
+          <div className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover">
             <IoLogOutOutline size={30} className=" mr-3" />
             Logout
           </div>

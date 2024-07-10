@@ -71,13 +71,19 @@ const updateList = async (req, res) => {
         res.json({ result: "no error, but nothing modified either" });
       }
     } else if (req.body.action === "remove") {
-      if (req.body.action === "add") {
-        const result = ListSchema.updateOne(
-          { email: user, title: req.body.title },
-          { $pull: { media: { id: req.body.mediaItem.id } } }
-        );
-        console.log(result);
-        res.json({ result: result, userAuthentication: req.decoded.email });
+      const result = await ListSchema.updateOne(
+        { email: user, title: req.body.title },
+        { $pull: { media: { id: req.body.mediaItem.id } } }
+      );
+      console.log("Removed Movie From List");
+      console.log(result.modifiedCount);
+      if (result.modifiedCount > 0) {
+        res.json({
+          result: "success",
+          userAuthentication: req.decoded.email,
+        });
+      } else {
+        res.json({ result: "no error, but nothing modified either" });
       }
     } else {
       res.staus(400).json("Invalid action specified");
@@ -87,16 +93,18 @@ const updateList = async (req, res) => {
     res.status(500).send("Failed to update list");
   }
 };
-const deleteList = (req, res) => {
+const deleteList = async (req, res) => {
+  console.log("Inside Delete List");
+  console.log(req.body.title);
   try {
-    const response = ListSchema.deleteOne({
+    const response = await ListSchema.deleteOne({
       email: req.body.user,
       title: req.body.title,
     });
-    console.log(response);
-    res.json(response);
+    console.log(response.deletedCount);
+    res.json("Success");
   } catch (error) {
-    console.log("Can not find list with that name", error);
+    console.log("Error", error);
     res.status(500).json("Failed to deleted list");
   }
 };
