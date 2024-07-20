@@ -23,6 +23,8 @@ Data Scraping and Integration:
 Implemented efficient scraping techniques to ensure accurate and up-to-date Rotten Tomatoes scores, handling any changes in the website’s structure dynamically.
 Performance Optimization:
 Used Redis for caching to enhance performance, ensuring quick access to frequently requested data and reducing server load.
+
+
 Current Enhancements:
 I am currently working on leveraging the Google Maps API to show nearby cinemas, allowing users to rate cinemas on various categories like seating, food, sound quality, and more. This information will be displayed next to each movie along with details about the streaming services where the movie is available. This enhancement aims to provide a holistic view of the movie-watching experience, combining both cinema ratings and streaming availability for user convenience.
 
