@@ -24,11 +24,11 @@ const authenticateUser = (req, res, next) => {
   }
 };
 const getLists = async (req, res) => {
-  console.log("inside getting list");
+  // console.log("inside getting list");
   const user = req.body.user;
   try {
     const listData = await ListSchema.find({ email: user });
-    console.log("List Data" + listData);
+    // console.log("List Data" + listData);
     console.log(req.decoded);
     res.json({ listData: listData, userAuthentication: req.decoded.email });
   } catch (error) {

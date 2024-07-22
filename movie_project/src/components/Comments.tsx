@@ -168,8 +168,8 @@ function Comments({ movie }: Props) {
         allComments
           ?.slice()
           .reverse()
-          .map((comment: Comment) => (
-            <div className="flex mt-6">
+          .map((comment: Comment, index) => (
+            <div className="flex mt-6" key={index}>
               <div className="rounded-full bg-very-light-black">
                 <CiUser size={60} />
               </div>

@@ -35,6 +35,28 @@ interface Movie {
   criticScore: string;
   status: string;
 }
+interface StreamingInfo {
+  link: string;
+  service: {
+    name: string;
+    imageSet: {
+      darkThemeImage: string;
+      lightThemeImage: string;
+      whiteImage: string;
+    };
+  };
+  type: string;
+}
+interface allRatings {
+  source: string;
+  value: string;
+  score: string;
+  votes: string;
+}
+interface Ratings {
+  certification: string;
+  ratings: allRatings[];
+}
 infinity.register();
 function SearchPage() {
   const navigate = useNavigate();
@@ -47,11 +69,38 @@ function SearchPage() {
   const [movieData, setMovieData] = useState<Movie | null>(null);
   const [trailer, setTrailer] = useState(false);
   const [isMovie, setisMovie] = useState(true);
+  const [streamingInfo, setStreamingInfo] = useState<StreamingInfo[]>([]);
+  const [ratingList, setRatings] = useState<Ratings | null>(null);
   // const [scores, setScores] = useState("");
   useEffect(() => {
     getData();
+    getWatchProviders();
+    getRatings();
   }, []);
-
+  const getWatchProviders = async () => {
+    try {
+      const result = await axios.post("/homepage/watchProvider", {
+        mediaType: mediaType,
+        id: id,
+      });
+      console.log(result.data);
+      if (result.data.us == null) {
+        setStreamingInfo([]);
+      } else {
+        setStreamingInfo(result.data.us);
+      }
+    } catch (error) {}
+  };
+  const getRatings = async () => {
+    try {
+      const result = await axios.post("/homepage/ratings", {
+        mediaType: mediaType,
+        id: id,
+      });
+      console.log(result.data);
+      setRatings(result.data);
+    } catch (error) {}
+  };
   useEffect(() => {
     if (movieData) {
       getLists();
@@ -67,7 +116,7 @@ function SearchPage() {
         for (var j = 0; j < list.length; j++) {
           if (list[j].id === movieData?.id) {
             setBookMarkValue(true);
-            return; // Exit the function once the movie is found in the lists
+            return;
           }
         }
       }
@@ -79,6 +128,7 @@ function SearchPage() {
       type: mediaType,
       id: id,
     });
+    console.log(result.data);
     if (mediaType === "tv") {
       setisMovie(false);
     }
@@ -111,10 +161,19 @@ function SearchPage() {
       audienceScore: score.data.audienceScore,
       criticScore: score.data.criticScore,
     });
-    // setScores(score.data);
-    // console.log(result.data.trailer.key);
-    // console.log(result.data);
   };
+  const uniqueStreamingInfo: StreamingInfo[] = [];
+  const addedServices = new Set();
+
+  streamingInfo
+    .filter((info) => info.type === "buy" || info.type === "subscription")
+    .forEach((info) => {
+      if (!addedServices.has(info.service.name)) {
+        uniqueStreamingInfo.push(info);
+        addedServices.add(info.service.name);
+      }
+    });
+
   return (
     <>
       {movieData ? (
@@ -158,10 +217,11 @@ function SearchPage() {
               <h1 className=" absolute left-10 bottom-20 text-xl roboto-regular tracking-wider">
                 {mediaType === "tv"
                   ? movieData?.original_name
-                  : movieData?.original_title}
+                  : movieData?.original_title}{" "}
+                ({movieData?.original_language})
               </h1>
               <div className="absolute left-10 bottom-14 text-sm flex space-x-4">
-                <p key="adult">{movieData?.adult ? "M" : "PG"}</p>
+                <p key="adult">{ratingList?.certification}</p>
                 <p key="runtime">
                   {mediaType === "tv" ? null : movieData?.runtime + "m"}
                 </p>
@@ -199,11 +259,14 @@ function SearchPage() {
             </div>
             <hr className="my-5 border-gray-400"></hr>
             <div className="flex space-x-4 pb-6">
-              <img
-                src={`https://image.tmdb.org/t/p/w500/${movieData?.poster_path}`}
-                className="w-36 rounded-xl"
-              ></img>
-              <div>
+              <div className="flex-none">
+                <img
+                  src={`https://image.tmdb.org/t/p/w500/${movieData?.poster_path}`}
+                  className="w-36 h-auto rounded-xl"
+                  alt="Poster"
+                />
+              </div>
+              <div className="flex-grow">
                 <div className="flex items-center">
                   <p className="roboto-bold text-lg pb-2 tracking-wide ">
                     {mediaType === "tv"
@@ -218,21 +281,61 @@ function SearchPage() {
                         movieData?.director}
                   </p>
                 </div>
-
                 <p className="roboto-regular mb-6">{movieData?.overview}</p>
-                <div className="flex items-center">
-                  <img
-                    src="../public/Rotten_Tomatoes.png"
-                    alt="Rotten Tomatoes"
-                    className="w-12 mr-4"
-                  />
-                  <p className="roboto-bold text-red-400">
-                    {": " + movieData.audienceScore > movieData.criticScore
-                      ? movieData.audienceScore
-                      : movieData.criticScore}
-                  </p>
-                  <img></img>
-                  <p></p>
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center space-x-8">
+                    <div className="flex items-center space-x-4">
+                      <img
+                        src="../public/Rotten_Tomatoes.png"
+                        alt="Rotten Tomatoes"
+                        className="w-12"
+                      />
+                      {ratingList?.ratings
+                        .filter((rating) => rating.source === "tomatoes")
+                        .map((rating, index) => (
+                          <p key={index} className="roboto-bold text-red-400">
+                            {rating.value === null
+                              ? "Not Found"
+                              : rating.value + "%"}
+                          </p>
+                        ))}
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <img
+                        src="../public/IMDb-Logo.png"
+                        alt="IMDb"
+                        className="w-12"
+                      />
+                      {ratingList?.ratings
+                        .filter((rating) => rating.source === "imdb")
+                        .map((rating, index) => (
+                          <p
+                            key={index}
+                            className="roboto-bold text-yellow-500"
+                          >
+                            {rating.value + "/10"}
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                  <div className="flex overflow-auto space-x-4">
+                    {uniqueStreamingInfo.length > 0 &&
+                      uniqueStreamingInfo.map((info, index) => (
+                        <div
+                          key={index}
+                          className="hover:bg-very-light-black rounded-full cursor-pointer h-20 w-20 flex items-center justify-center"
+                          onClick={() => {
+                            window.open(info.link, "_blank");
+                          }}
+                        >
+                          <img
+                            src={info.service.imageSet.darkThemeImage}
+                            className="max-w-full max-h-full object-contain p-2"
+                            alt={info.service.name}
+                          />
+                        </div>
+                      ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -246,6 +349,7 @@ function SearchPage() {
                       <div className="px-4 py-3 w-44 flex-shrink-0">
                         <img
                           src={`https://image.tmdb.org/t/p/w500/${cast.profile_path}`}
+                          alt="../public/depositphotos_133352010-stock-illustration-default-placeholder-man-and-woman.jpg"
                           className="rounded-xl mb-2"
                         ></img>
                         <h1

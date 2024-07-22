@@ -10,6 +10,8 @@ import HomePage from "./components/HomePage";
 axios.defaults.baseURL = "http://localhost:8000";
 import axios from "axios";
 import MyLists from "./components/MyLists";
+import MoviesPage from "./components/MoviesPage";
+import Discover from "./components/Discover";
 
 axios.defaults.withCredentials = true;
 let router = createBrowserRouter([
@@ -29,6 +31,10 @@ let router = createBrowserRouter([
     path: "/MyList",
     element: <MyLists />,
   },
+  {
+    path: "/discover",
+    element: <Discover />,
+  },
 ]);
 function App() {
   return (
@@ -38,7 +44,6 @@ function App() {
           router={router}
           fallbackElement={<p>Loading..</p>}
         ></RouterProvider>
-        {/* <RouteHandler /> */}
       </UserContext>
     </>
   );

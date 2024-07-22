@@ -13,8 +13,24 @@ interface Movie {
   id: number;
   original_title: string;
   poster_path: string;
+  backdrop_path: string;
+  original_name: string;
+  overview: string;
+  genres: any[];
+  runtime: number;
   release_date: string;
   original_language: string;
+  adult: boolean;
+  cast: any[];
+  director: string;
+  trailer: {
+    key: string;
+  };
+  first_air_date: string;
+  last_air_date: string;
+  audienceScore: string;
+  criticScore: string;
+  status: string;
 }
 interface media {
   _id: string;
@@ -218,7 +234,11 @@ function MyLists() {
                                   onClick={() => handleMovieClick(movie)}
                                   // alt={`Poster for ${movie.title}`}
                                 />
-                                <p className="mt-6">{movie.original_title}</p>
+                                <p className="mt-6 text-plat">
+                                  {movie.original_title !== null
+                                    ? movie.original_title
+                                    : movie.original_name}
+                                </p>
                               </div>
                             ))}
                           </div>

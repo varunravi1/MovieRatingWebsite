@@ -1,10 +1,15 @@
 const cheerio = require("cheerio");
 const axios = require("axios");
 const ScoreSchema = require("../models/scores");
-
+const streamingAvailability = require("streaming-availability");
 const WEEK_EXPIRATION = 259200;
+const DAY_EXPIRATION = 86400;
 // const { search } = require("../routes/userRoutes");
-
+const streamAPI = new streamingAvailability.Client(
+  new streamingAvailability.Configuration({
+    apiKey: process.env.STREAMING_AVAILABILITY,
+  })
+);
 // await client.connect();
 const requestScroller = async (req, res) => {
   try {
@@ -19,13 +24,13 @@ const requestScroller = async (req, res) => {
       const response1 = await axios.get(
         `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
           "2024-03-01"
-        )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&page=1`
+        )}&api_key=${process.env.TMDB_API}&page=1`
       );
       console.log("API Hit in MovieScroller");
       const response2 = await axios.get(
         `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
           "2024-03-01"
-        )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&page=2`
+        )}&api_key=${process.env.TMDB_API}&page=2`
       );
       const combinedResults = {
         ...response1.data, // This spreads the first response object properties
@@ -259,12 +264,12 @@ const searchFunc = async (req, res) => {
       axios.get(
         `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
           searchQuery
-        )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&language=en-US`
+        )}&api_key=${process.env.TMDB_API}&language=en-US`
       ),
       axios.get(
         `https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(
           searchQuery
-        )}&api_key=8fa4fa6e422540365b21966c86cd2f9a&language=en-US`
+        )}&api_key=${process.env.TMDB_API}&language=en-US`
       ),
     ]);
     res.json({ movies: responseMovie.data, tv: responseShow.data });
@@ -273,10 +278,146 @@ const searchFunc = async (req, res) => {
     console.error(error);
   }
 };
+const getMovies = async (req, res) => {
+  pagenum = Number(req.body.page);
+  genres = req.body.genres;
+  console.log(genres);
+  // console.log(req.body);
+  let genreQuery = "";
+
+  if (genres != null && genres.length > 0) {
+    genreQuery = "&with_genres=" + genres.map(String).join("%2C");
+  }
+  console.log("This is genre query");
+  console.log(genreQuery);
+  const data = await req.redisClient.get(`movie+${pagenum}+${genreQuery}`);
+  // console.log(data);
+  if (data != null) {
+    console.log("cache hit!!");
+    res.json(JSON.parse(data));
+  } else {
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API}&page=${pagenum}${genreQuery}`
+      );
+      await req.redisClient.set(
+        `movie+${pagenum}+${genreQuery}`,
+        JSON.stringify(response.data),
+        {
+          EX: DAY_EXPIRATION,
+        }
+      );
+      // console.log(response.data);
+      res.json(response.data);
+    } catch (error) {
+      console.log(error);
+      res.status(500);
+    }
+  }
+};
+
+const getTV = async (req, res) => {
+  pagenum = Number(req.body.page);
+  genres = req.body.genres;
+  console.log(genres);
+  // console.log(req.body);
+  let genreQuery = "";
+
+  if (genres != null && genres.length > 0) {
+    genreQuery = "&with_genres=" + genres.map(String).join("%2C");
+  }
+  console.log("This is genre query");
+  console.log(genreQuery);
+  const data = await req.redisClient.get(`tv+${pagenum}+${genreQuery}`);
+  // console.log(data);
+  if (data != null) {
+    console.log("cache hit!!");
+    res.json(JSON.parse(data));
+  } else {
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.TMDB_API}&page=${pagenum}${genreQuery}`
+      );
+      await req.redisClient.set(
+        `tv+${pagenum}+${genreQuery}`,
+        JSON.stringify(response.data),
+        {
+          EX: DAY_EXPIRATION,
+        }
+      );
+      // console.log(response.data);
+      res.json(response.data);
+    } catch (error) {
+      console.log(error);
+      res.status(500);
+    }
+  }
+};
+const getWatchProviders = async (req, res) => {
+  const mediaType = req.body.mediaType;
+  const id = req.body.id;
+  console.log(req.body);
+  const data = await req.redisClient.get(`watchProvider/${mediaType}/${id}`);
+  if (data != null) {
+    console.log("cache hit!");
+    res.json(JSON.parse(data));
+  } else {
+    try {
+      const data = await streamAPI.showsApi.getShow({
+        id: `${mediaType.toLowerCase()}/${id}`,
+        country: "us",
+      });
+      req.redisClient.set(
+        `watchProvider/${mediaType}/${id}`,
+        JSON.stringify(data.streamingOptions),
+        {
+          EX: WEEK_EXPIRATION,
+        }
+      );
+      res.json(data.streamingOptions);
+    } catch (error) {
+      console.log(error);
+      res.status(501).json("error");
+    }
+  }
+};
+const getMovieRatings = async (req, res) => {
+  const id = req.body.id;
+  const mediaType = req.body.mediaType;
+  const data = await req.redisClient.get(`ratings/${mediaType}/${id}`);
+  if (data != null) {
+    console.log("cache hit inside movieRatings!");
+    res.json(JSON.parse(data));
+  } else {
+    try {
+      const result = await axios.get(
+        `https://mdblist.com/api?apikey=${process.env.MDB_LIST}&tm=${id}&m=${
+          mediaType.toLowerCase() === "tv" ? "show" : "movie"
+        }`
+      );
+      req.redisClient.set(
+        `ratings/${mediaType}/${id}`,
+        JSON.stringify(result.data),
+        {
+          EX: DAY_EXPIRATION,
+        }
+      );
+      // console.log(result.data);
+      res.json(result.data);
+    } catch (error) {
+      console.log(data);
+      res.status(501).json("error");
+    }
+  }
+};
 
 module.exports = {
   requestScroller,
   scraper,
   delay,
   searchFunc,
+  getMovies,
+  getTV,
+  getWatchProviders,
+  getMovieRatings,
 };

@@ -32,14 +32,14 @@ function UserMenu({ onClick }: Props) {
             <IoIosSettings size={30} className=" mr-3" />
             Settings
           </div>
+          <div className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover">
+            <FaRegUser size={28} className=" mr-3" />
+            Profile
+          </div>
           <div
             className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover"
             onClick={onClick}
           >
-            <FaRegUser size={28} className=" mr-3" />
-            Profile
-          </div>
-          <div className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover">
             <IoLogOutOutline size={30} className=" mr-3" />
             Logout
           </div>

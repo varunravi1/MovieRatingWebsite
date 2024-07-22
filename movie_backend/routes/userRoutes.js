@@ -33,7 +33,7 @@ router.get("/scroll", async (req, res) => {
     const response = await axios.get(
       `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
         query
-      )}&api_key=8fa4fa6e422540365b21966c86cd2f9a`
+      )}&api_key=${process.env.TMDB_API}`
     );
     console.log(response.data);
   } catch (error) {

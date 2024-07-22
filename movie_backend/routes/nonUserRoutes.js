@@ -4,6 +4,10 @@ const {
   scraper,
   requestScroller,
   searchFunc,
+  getMovies,
+  getTV,
+  getWatchProviders,
+  getMovieRatings,
 } = require("../controllers/tmdbController");
 const cors = require("cors");
 const router = express.Router();
@@ -18,4 +22,8 @@ router.use(
 router.post("/scores", scraper);
 router.get("/scroller", requestScroller);
 router.post("/search", searchFunc);
+router.post("/movies", getMovies);
+router.post("/tv", getTV);
+router.post("/watchProvider", getWatchProviders);
+router.post("/ratings", getMovieRatings);
 module.exports = router;

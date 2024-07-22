@@ -46,11 +46,11 @@ function NavBarLoggedIn() {
         <Link to={"/"} className="navBar roboto-bold">
           Home
         </Link>
-        <button className="navBar roboto-bold hidden sm:inline-block">
-          Movies
-        </button>
-        <button className="navBar roboto-bold hidden md:inline-block">
-          TV Shows
+        <button
+          className="navBar roboto-bold hidden sm:inline-block"
+          onClick={() => navigate("/discover")}
+        >
+          Discover
         </button>
         <button className="navBar roboto-bold hidden xl:inline-block">
           Moviedle
