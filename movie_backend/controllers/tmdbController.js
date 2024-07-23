@@ -399,7 +399,7 @@ const getMovieRatings = async (req, res) => {
         `ratings/${mediaType}/${id}`,
         JSON.stringify(result.data),
         {
-          EX: DAY_EXPIRATION,
+          EX: WEEK_EXPIRATION,
         }
       );
       // console.log(result.data);
@@ -408,6 +408,18 @@ const getMovieRatings = async (req, res) => {
       console.log(data);
       res.status(501).json("error");
     }
+  }
+};
+const getActorInformation = async (req, res) => {
+  const actorID = req.body.actorID;
+  try {
+    const result = await axios.get(
+      `https://api.themoviedb.org/3/person/${actorID}?api_key=${process.env.TMDB_API}&append_to_response=tv_credits%2Cmovie_credits%2Cimages%2Cexternal_ids`
+    );
+    res.json(result.data);
+  } catch (error) {
+    console.log(error);
+    res.status(501).json("error");
   }
 };
 
@@ -420,4 +432,5 @@ module.exports = {
   getTV,
   getWatchProviders,
   getMovieRatings,
+  getActorInformation,
 };

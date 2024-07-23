@@ -12,6 +12,7 @@ import axios from "axios";
 import MyLists from "./components/MyLists";
 import MoviesPage from "./components/MoviesPage";
 import Discover from "./components/Discover";
+import ActorPage from "./components/ActorPage";
 
 axios.defaults.withCredentials = true;
 let router = createBrowserRouter([
@@ -26,6 +27,10 @@ let router = createBrowserRouter([
   {
     path: ":type/:id",
     element: <SearchPage />,
+  },
+  {
+    path: "/actor/:id",
+    element: <ActorPage />,
   },
   {
     path: "/MyList",

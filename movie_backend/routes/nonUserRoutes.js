@@ -8,6 +8,7 @@ const {
   getTV,
   getWatchProviders,
   getMovieRatings,
+  getActorInformation,
 } = require("../controllers/tmdbController");
 const cors = require("cors");
 const router = express.Router();
@@ -26,4 +27,5 @@ router.post("/movies", getMovies);
 router.post("/tv", getTV);
 router.post("/watchProvider", getWatchProviders);
 router.post("/ratings", getMovieRatings);
+router.post("/actor", getActorInformation);
 module.exports = router;

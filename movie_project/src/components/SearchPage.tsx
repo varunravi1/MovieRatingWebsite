@@ -83,7 +83,7 @@ function SearchPage() {
         mediaType: mediaType,
         id: id,
       });
-      console.log(result.data);
+      // console.log(result.data);
       if (result.data.us == null) {
         setStreamingInfo([]);
       } else {
@@ -97,7 +97,7 @@ function SearchPage() {
         mediaType: mediaType,
         id: id,
       });
-      console.log(result.data);
+      // console.log(result.data);
       setRatings(result.data);
     } catch (error) {}
   };
@@ -166,7 +166,12 @@ function SearchPage() {
   const addedServices = new Set();
 
   streamingInfo
-    .filter((info) => info.type === "buy" || info.type === "subscription")
+    .filter(
+      (info) =>
+        info.type === "buy" ||
+        info.type === "subscription" ||
+        info.type === "rent"
+    )
     .forEach((info) => {
       if (!addedServices.has(info.service.name)) {
         uniqueStreamingInfo.push(info);
@@ -291,7 +296,7 @@ function SearchPage() {
                         className="w-12"
                       />
                       {ratingList?.ratings
-                        .filter((rating) => rating.source === "tomatoes")
+                        ?.filter((rating) => rating.source === "tomatoes")
                         .map((rating, index) => (
                           <p key={index} className="roboto-bold text-red-400">
                             {rating.value === null
@@ -300,6 +305,24 @@ function SearchPage() {
                           </p>
                         ))}
                     </div>
+                    {/* <div className="flex items-center space-x-4">
+                      <img
+                        src="../public/Rotten_Tomatoes_audience.png"
+                        alt="Rotten Tomatoes"
+                        className="w-12"
+                      />
+                      {ratingList?.ratings
+                        .filter(
+                          (rating) => rating.source === "tomatoesaudience"
+                        )
+                        .map((rating, index) => (
+                          <p key={index} className="roboto-bold text-red-400">
+                            {rating.value === null
+                              ? "Not Found"
+                              : rating.value + "%"}
+                          </p>
+                        ))}
+                    </div> */}
                     <div className="flex items-center space-x-4">
                       <img
                         src="../public/IMDb-Logo.png"
@@ -307,7 +330,7 @@ function SearchPage() {
                         className="w-12"
                       />
                       {ratingList?.ratings
-                        .filter((rating) => rating.source === "imdb")
+                        ?.filter((rating) => rating.source === "imdb")
                         .map((rating, index) => (
                           <p
                             key={index}
@@ -340,27 +363,24 @@ function SearchPage() {
               </div>
             </div>
             <div>
-              <div className="where-to-watch"></div>
               <div className="roboto-bold mb-3">Cast</div>
               <div className="flex max-w-full max-h-80 overflow-x-auto whitespace-nowrap rounded-3xl justify-between">
                 {movieData &&
                   movieData.cast.map((cast) => (
-                    <>
-                      <div className="px-4 py-3 w-44 flex-shrink-0">
-                        <img
-                          src={`https://image.tmdb.org/t/p/w500/${cast.profile_path}`}
-                          alt="../public/depositphotos_133352010-stock-illustration-default-placeholder-man-and-woman.jpg"
-                          className="rounded-xl mb-2"
-                        ></img>
-                        <h1
-                          className="roboto-regular text-base"
-                          key={cast.cast_id}
-                        >
-                          {cast.name}
-                        </h1>
-                        <p className="roboto-light text-xs">{cast.character}</p>
-                      </div>
-                    </>
+                    <div
+                      className="px-4 py-3 w-44 flex-shrink-0 cursor-pointer hover:underline"
+                      key={cast.cast_id}
+                      onClick={() => {
+                        navigate(`/actor/${cast.id}`);
+                      }}
+                    >
+                      <img
+                        src={`https://image.tmdb.org/t/p/w500/${cast.profile_path}`}
+                        className="rounded-xl mb-2"
+                      ></img>
+                      <h1 className="roboto-regular text-base ">{cast.name}</h1>
+                      <p className="roboto-light text-xs ">{cast.character}</p>
+                    </div>
                   ))}
               </div>
             </div>
