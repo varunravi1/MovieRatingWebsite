@@ -74,7 +74,7 @@ function TVPage({ selectedTVGenres }: Props) {
   };
   return (
     <>
-      <div className="flex flex-wrap ml-12">
+      <div className="flex flex-wrap md:ml-6 lg:ml-12">
         {movieData
           ?.filter((movie: Movie) =>
             selectedTVGenres.length === 0
@@ -85,7 +85,7 @@ function TVPage({ selectedTVGenres }: Props) {
           )
           .map((movie: Movie) => (
             <div
-              className="mt-4 p-2 hover:bg-black-hover cursor-pointer rounded-2xl"
+              className="mt-4 p-2 hover:bg-black-hover cursor-pointer rounded-2xl w-1/2 lg:w-60 lg:h-[340px]"
               onClick={() => {
                 navigate(
                   `/${movie.original_title ? "movie" : "tv"}/${movie.id}`
@@ -96,7 +96,7 @@ function TVPage({ selectedTVGenres }: Props) {
               <img
                 src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
                 alt={movie.original_title}
-                className="max-w-56 rounded-2xl"
+                className="w-full h-full object-cover rounded-2xl"
               />
             </div>
           ))}
