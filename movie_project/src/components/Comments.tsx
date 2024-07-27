@@ -4,11 +4,25 @@ import { CiUser } from "react-icons/ci";
 import axios from "axios";
 import FlipLogin from "./FlipLogin";
 import { ImCancelCircle } from "react-icons/im";
+interface ProductionCompany {
+  id: number;
+  logo_path: string;
+  name: string;
+}
+interface Video {
+  id: string;
+  name: string;
+  type: string;
+}
 interface Movie {
   id: number;
   original_title: string;
   poster_path: string;
   backdrop_path: string;
+  homepage: string;
+  budget: number;
+  revenue: number;
+  tagline: string;
   original_name: string;
   overview: string;
   genres: any[];
@@ -16,11 +30,15 @@ interface Movie {
   release_date: string;
   original_language: string;
   adult: boolean;
-  cast: any[];
-  director: string;
-  trailer: {
-    key: string;
+  credits: {
+    cast: any[];
   };
+  production_companies: ProductionCompany[];
+  director: string;
+  videos: {
+    results: Video[];
+  };
+  trailer: any;
   first_air_date: string;
   last_air_date: string;
   audienceScore: string;
@@ -129,7 +147,7 @@ function Comments({ movie }: Props) {
   };
   return (
     <div id="search-comment" className="mt-6 ">
-      <p className="roboto-bold my-4">Comments</p>
+      <p className="roboto-bold my-4 md:text-lg lg:text-xl">Comments</p>
 
       <div className="bg-plat rounded-lg">
         <textarea

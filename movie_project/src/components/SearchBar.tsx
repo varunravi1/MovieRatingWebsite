@@ -77,7 +77,7 @@ function SearchBar() {
             </button>
           </div>
         </form>
-        <div className="search-results bg-transparent cursor-pointer mt-2 rounded-2xl overflow-hidden overflow-y-hidden ">
+        <div className="search-results w-72 md:w-full bg-transparent cursor-pointer mt-2 rounded-2xl overflow-hidden overflow-y-hidden ">
           {searchResult != null ? (
             <>
               {searchResult.map((movie: Movie) => (

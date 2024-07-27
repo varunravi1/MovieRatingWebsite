@@ -62,6 +62,11 @@ function PopUpLists({
         title: title,
         media: mediaType,
       });
+      setListData((prevListData) => {
+        return prevListData
+          ? [...prevListData, results.data.created]
+          : [results.data.created];
+      });
       console.log(results);
       setcreateList(false);
     } catch (error) {}

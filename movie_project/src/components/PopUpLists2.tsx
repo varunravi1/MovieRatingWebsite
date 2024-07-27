@@ -11,11 +11,25 @@ import { CgAdd } from "react-icons/cg";
 import { ImCancelCircle } from "react-icons/im";
 import { set } from "zod";
 
+interface ProductionCompany {
+  id: number;
+  logo_path: string;
+  name: string;
+}
+interface Video {
+  id: string;
+  name: string;
+  type: string;
+}
 interface Movie {
   id: number;
   original_title: string;
   poster_path: string;
   backdrop_path: string;
+  homepage: string;
+  budget: number;
+  revenue: number;
+  tagline: string;
   original_name: string;
   overview: string;
   genres: any[];
@@ -23,11 +37,15 @@ interface Movie {
   release_date: string;
   original_language: string;
   adult: boolean;
-  cast: any[];
-  director: string;
-  trailer: {
-    key: string;
+  credits: {
+    cast: any[];
   };
+  production_companies: ProductionCompany[];
+  director: string;
+  videos: {
+    results: Video[];
+  };
+  trailer: any;
   first_air_date: string;
   last_air_date: string;
   audienceScore: string;
@@ -81,16 +99,42 @@ function PopUpLists2({ tvormov, setPopUpLists, setBookMarkValue }: Props) {
       });
     } catch (error) {}
   };
+  // const handleAddtoList = async (list: media) => {
+  //   try {
+  //     console.log(list._id);
+  //     console.log("Trying to add to list");
+  //     const response = await axios.patch(`/user/list${list._id}`, {
+  //       title: list.title,
+  //       user: user,
+  //       mediaItem: tvormov,
+  //       action: "add",
+  //     });
+  //     setPopUpLists(false);
+  //     setBookMarkValue(true);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   const handleAddtoList = async (list: media) => {
     try {
       console.log(list._id);
       console.log("Trying to add to list");
+
+      // Extract only the required fields from tvormov
+      const mediaItem = {
+        id: tvormov.id,
+        poster_path: tvormov.poster_path,
+        original_name: tvormov.original_name,
+        original_title: tvormov.original_title,
+      };
+
       const response = await axios.patch(`/user/list${list._id}`, {
         title: list.title,
         user: user,
-        mediaItem: tvormov,
+        mediaItem: mediaItem,
         action: "add",
       });
+
       setPopUpLists(false);
       setBookMarkValue(true);
     } catch (error) {
@@ -100,7 +144,7 @@ function PopUpLists2({ tvormov, setPopUpLists, setBookMarkValue }: Props) {
   return (
     <>
       <div className="fixed flex items-center justify-center pop-up-lists-container w-svw h-svh top-0 left-0">
-        <div className="absolute bg-dim-gray w-[700px] h-[400px]">
+        <div className="absolute bg-dim-gray w-[400px] h-[300px] lg:w-[700px] lg:h-[400px] md:w-[550px] md:h-[350px]">
           <ImCancelCircle
             className="absolute top-0 right-0 mr-3 mt-4 cursor-pointer"
             size={20}

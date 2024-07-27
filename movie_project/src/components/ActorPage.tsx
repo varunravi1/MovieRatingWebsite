@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import NavBarLoggedIn from "./NavBarLoggedIn";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import ImageCarousel from "./ImageCarousel";
 interface MovieorShow {
   character: string;
   first_air_date: string;
@@ -65,10 +67,18 @@ enum TVGenres {
   "War and Politics" = 10768,
   "Western" = 37,
 }
-
+interface Image {
+  aspect_ratio: number;
+  file_path: string;
+  height: number;
+  width: number;
+}
 interface ActorInformation {
+  id: string;
   allMedia: MovieorShow[];
-
+  images: {
+    profiles: Image[];
+  };
   name: string;
   biography: string;
   birthday: string;
@@ -85,16 +95,21 @@ interface ActorInformation {
   };
   known_for: MovieorShow[];
 }
+interface RefObject {
+  [key: string]: HTMLDivElement | null;
+}
+
 function ActorPage() {
   const parameters = useParams();
   const navigate = useNavigate();
   const actorID = parameters.id;
+  const scrollPos = useRef<RefObject>({});
+
   const [actorInformation, setActorInformation] = useState<ActorInformation>();
   const [isExpanded, setIsExpanded] = useState(false);
   const toggleExpand = () => setIsExpanded(!isExpanded);
 
   const truncateLength = 650;
-
   const shouldTruncate =
     actorInformation?.biography == null
       ? false
@@ -149,13 +164,13 @@ function ActorPage() {
   };
   return (
     <>
-      <div className="main-container shadow-lg min-h-svh">
+      <div className="main-container shadow-lg min-h-svh text-plat">
         <NavBarLoggedIn />
-        <div className="mt-10 ml-10">
-          <p className="roboto-bold tracking-wide text-3xl mb-6">
+        <div className=" mt-6 md:mt-10 md:ml-10">
+          <p className="roboto-bold tracking-wide text-3xl mb-6 text-center md:text-start">
             {actorInformation?.name}
           </p>
-          <div className="flex">
+          <div className="hidden md:flex">
             <img
               src={`https://image.tmdb.org/t/p/w500/${actorInformation?.profile_path}`}
               className="w-60 h-[360px] rounded-2xl flex-none"
@@ -176,31 +191,56 @@ function ActorPage() {
               )}
             </div>
           </div>
-          <p className="mt-4 roboto-regular">
-            {actorInformation?.birthday &&
-              "Age: " +
-                (
-                  new Date().getFullYear() -
-                  new Date(actorInformation?.birthday).getFullYear()
-                )
-                  .toString()
-                  .substring(0, 4)}
-          </p>
-          <p className="mt-4 roboto-regular">
-            {actorInformation?.birthday &&
-              "Date of Birth: " + actorInformation.birthday}
-          </p>
-          <p className="mt-4 roboto-regular">
-            {actorInformation?.place_of_birth &&
-              "Birthplace: " + actorInformation.place_of_birth}
-          </p>
+          <div className="md:hidden">
+            <div className="flex justify-center items-center mb-8">
+              <img
+                src={`https://image.tmdb.org/t/p/w500/${actorInformation?.profile_path}`}
+                className="w-60 h-[360px] rounded-2xl flex-none"
+              />
+            </div>
+
+            <div className="flex-grow ml-2 md:ml-4 mr-2 text-center">
+              <p className="roboto-regular text-lg mb-6">
+                {isExpanded
+                  ? actorInformation?.biography
+                  : actorInformation?.biography.substring(0, truncateLength)}
+              </p>
+              {shouldTruncate && (
+                <button
+                  onClick={toggleExpand}
+                  className="text-blue-500 underline mt-2"
+                >
+                  {isExpanded ? "Read Less" : "Read More"}
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="hidden md:block ml-2">
+            <p className="mt-4 roboto-regular">
+              {actorInformation?.birthday &&
+                "Age: " +
+                  (
+                    new Date().getFullYear() -
+                    new Date(actorInformation?.birthday).getFullYear()
+                  )
+                    .toString()
+                    .substring(0, 4)}
+            </p>
+            <p className="mt-4 roboto-regular">
+              {actorInformation?.place_of_birth &&
+                "Birthplace: " + actorInformation.place_of_birth}
+            </p>
+          </div>
+
           <div className="mt-10">
-            <p className="roboto-bold tracking-wide text-3xl mb-6">Popular</p>
+            <p className="roboto-bold tracking-wide text-3xl mb-6 text-plat">
+              Popular
+            </p>
             <div className="flex flex-wrap">
               {actorInformation?.known_for.map((movie: MovieorShow) => (
                 <div
                   key={movie.id}
-                  className="flex w-1/2 mb-6 cursor-pointer hover:bg-comp-black rounded-2xl"
+                  className="flex w-full md:w-1/2 mb-6 cursor-pointer hover:bg-comp-black rounded-2xl mr-3 md:mr-0"
                   onClick={() => {
                     movie.original_title
                       ? navigate(`/movie/${movie.id}`)
@@ -219,27 +259,38 @@ function ActorPage() {
                         : movie.original_name}
                     </p>
                     <p className="text-sm italic mb-2">{movie.character}</p>
-                    <div className="flex space-x-3 roboto-regular text-sm italic">
-                      {movie.genre_ids.map((genre: number) => (
-                        <p key={genre}>
-                          {movie.original_title
-                            ? MovieGenres[genre]
-                            : TVGenres[genre]}
-                        </p>
-                      ))}
+                    <div className="flex space-x-2 md:space-x-3 roboto-regular text-sm italic">
+                      {movie.genre_ids
+                        .filter((_, index) => index < 3)
+                        .map((genre: number) => (
+                          <p key={genre}>
+                            {movie.original_title
+                              ? MovieGenres[genre]
+                              : TVGenres[genre]}
+                          </p>
+                        ))}
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <p className="roboto-bold tracking-wide text-3xl mb-6">
+            <p className="roboto-bold tracking-wide text-3xl mb-6 text-plat">
+              Images
+            </p>
+            <ImageCarousel
+              type="cast"
+              scrollPos={scrollPos}
+              data={actorInformation?.images?.profiles as any}
+            />
+
+            <p className="roboto-bold tracking-wide text-3xl mb-6 text-plat">
               All Movies/Shows
             </p>
             <div className="flex flex-wrap">
               {actorInformation?.allMedia.map((movie: MovieorShow) => (
                 <div
                   key={movie.id}
-                  className="flex w-1/2 mb-6 cursor-pointer hover:bg-comp-black rounded-2xl"
+                  className="flex w-full md:w-1/2 mb-6 cursor-pointer hover:bg-comp-black rounded-2xl mr-3 md:mr-0"
                   onClick={() => {
                     movie.original_title
                       ? navigate(`/movie/${movie.id}`)
@@ -258,14 +309,16 @@ function ActorPage() {
                         : movie.original_name}
                     </p>
                     <p className="text-sm italic mb-2">{movie.character}</p>
-                    <div className="flex space-x-3 roboto-regular text-sm italic">
-                      {movie.genre_ids.map((genre: number) => (
-                        <p key={genre}>
-                          {movie.original_title
-                            ? MovieGenres[genre]
-                            : TVGenres[genre]}
-                        </p>
-                      ))}
+                    <div className="flex space-x-2 md:space-x-3 roboto-regular text-sm italic">
+                      {movie.genre_ids
+                        .filter((_, index) => index < 3)
+                        .map((genre: number) => (
+                          <p key={genre}>
+                            {movie.original_title
+                              ? MovieGenres[genre]
+                              : TVGenres[genre]}
+                          </p>
+                        ))}
                     </div>
                   </div>
                 </div>

@@ -7,7 +7,9 @@ const authenticateUser = (req, res, next) => {
   const bearerHeader = req.headers["authorization"];
   try {
     if (typeof bearerHeader !== "undefined") {
+      console.log("inside authenticateUser");
       const accessToken = bearerHeader.split(" ")[1];
+      console.log(bearerHeader);
       const decoded = jwt.verify(accessToken, process.env.LOGIN_SECRET);
       console.log("AUTHENTICATION WORKED");
       console.log(decoded);

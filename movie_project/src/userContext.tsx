@@ -8,7 +8,7 @@ import {
 } from "react";
 import axios from "axios";
 import { setAuthToken } from "./setAuthToken";
-import { LuUserSquare } from "react-icons/lu";
+
 interface children {
   children: ReactNode;
 }
@@ -53,6 +53,8 @@ function UserContext({ children }: children) {
       setAuthToken(localStorage.getItem("accessToken"));
       const response = await axios.get("/user");
       updateUser(response.data.userAuthentication);
+      console.log("This is the user");
+      console.log(response.data.userAuthentication);
       setIsAuthLoading(false);
     } catch (error: any) {
       console.log("Access Token is not valid");

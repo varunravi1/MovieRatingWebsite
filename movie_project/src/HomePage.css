@@ -19,3 +19,16 @@ body {
   border-top: 1px solid #eee;
   margin-top: 20px;
 }
+/* HomePage.css */
+
+.transform {
+  transition: transform 0.3s ease-in-out;
+}
+
+.translate-x-0 {
+  transform: translateX(0);
+}
+
+.-translate-x-full {
+  transform: translateX(-100%);
+}

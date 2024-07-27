@@ -151,7 +151,7 @@ function MyLists() {
       <div className="main-container shadow-lg min-h-svh">
         <NavBarLoggedIn></NavBarLoggedIn>
         <div className="flex pt-2">
-          <div className="mt-4 w-60 min-h-svh shrink-0">
+          <div className="mt-4 w-60 min-h-svh shrink-0 sticky">
             <SideBarLists
               setSelected={setSelected}
               selected={selected}
@@ -315,7 +315,7 @@ function MyLists() {
 
                 <div className="w-full">
                   <button
-                    className="w-full bg-dim-gray hover:bg-yt-black text-white font-bold py-2 px-4 rounded-md shadow active:scale-95 active:ring-4 ring-purp"
+                    className="w-full bg-dim-gray hover:bg-yt-black text-plat font-bold py-2 px-4 rounded-md shadow active:scale-95 active:ring-4 ring-purp"
                     onClick={handleCreateList}
                   >
                     Create List

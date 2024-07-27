@@ -7,8 +7,12 @@ import { ImCancelCircle } from "react-icons/im";
 import FlipLogin from "./FlipLogin";
 import { IoIosSettings } from "react-icons/io";
 import UserMenu from "./UserMenu";
+import { RxHamburgerMenu } from "react-icons/rx";
+import NavBarSideBar from "./NavBarSideBar";
+
 function NavBarLoggedIn() {
   const { user, updateUser } = useContext(LoginContext);
+  const [sideBar, setSideBar] = useState(false);
   const [signUp, setSignUp] = useState(false);
   const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
@@ -43,11 +47,21 @@ function NavBarLoggedIn() {
       )}
 
       <div className=" fixed-bar flex justify-between px-5">
-        <Link to={"/"} className="navBar roboto-bold">
+        <RxHamburgerMenu
+          className="navBar roboto-bold inline-block lg:hidden cursor-pointer"
+          size={30}
+          onClick={() => {
+            setSideBar(!sideBar);
+          }}
+        />
+        <div className="absolute overflow-hidden transition-all">
+          <NavBarSideBar sideBar={sideBar} setSideBar={setSideBar} />
+        </div>
+        <Link to={"/"} className="navBar roboto-bold hidden lg:inline-block">
           Home
         </Link>
         <button
-          className="navBar roboto-bold hidden sm:inline-block"
+          className="navBar roboto-bold hidden lg:inline-block"
           onClick={() => navigate("/discover")}
         >
           Discover
@@ -55,11 +69,6 @@ function NavBarLoggedIn() {
         <button className="navBar roboto-bold hidden xl:inline-block">
           Moviedle
         </button>
-        {/* {user && (
-          <button className="navBar roboto-bold hidden lg:inline-block">
-            My Lists
-          </button>
-        )} */}
         {user ? (
           <div className="relative">
             <IoIosSettings

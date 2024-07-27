@@ -16,9 +16,14 @@ const hashFunc = (password) => {
 const comparePass = async (password, hashed) => {
   return await bcrypt.compare(password, hashed);
 };
-const issueToken = (data) => {
+const issueRefreshToken = (data) => {
+  return jwt.sign({ email: data }, process.env.LOGIN_REFRESH_SECRET, {
+    expiresIn: "90d",
+  });
+};
+const issueAccessToken = (data) => {
   return jwt.sign({ email: data }, process.env.LOGIN_SECRET, {
-    expiresIn: "30m",
+    expiresIn: "2h",
   });
 };
 //REGISTERING USER
@@ -36,11 +41,8 @@ const registerUser = async (req, res) => {
         err: "password is required and should be atleast 8 characters long",
       });
     }
-    const accessToken = issueToken(email);
-    const refreshToken = jwt.sign(
-      { email: email },
-      process.env.LOGIN_REFRESH_SECRET
-    );
+    const accessToken = issueAccessToken(email);
+    const refreshToken = issueRefreshToken(email);
     const pass = await hashFunc(password);
     const user = await UserSchema.create({
       username,
@@ -92,45 +94,25 @@ const loginUser = async (req, res) => {
       const isMatch = await comparePass(password, isValidEmail.password); //COMPARES PASSWORD TO HASHED PASSWORD TO MAKE SURE IT IS THE CORRECT PASSWORD
       console.log(isMatch);
       if (isMatch) {
-        const refreshToken = jwt.sign(
-          //CREATING A NEW REFRESH TOKEN EVERYTIME WE SIGN IN
-          { email: login },
-          process.env.LOGIN_REFRESH_SECRET
-        );
-        res.cookie("refreshToken", refreshToken, {
-          //PUTTING IT IN THE COOKIE SO IT IS SECURE
-          httpOnly: true,
-          path: "/refresh_token",
-          secure: true,
-          sameSite: "Strict",
-        });
+        const refreshToken = issueRefreshToken(login);
+        console.log("This is the newly issued refresh token ", refreshToken);
+        const accessToken = issueAccessToken(login);
+        console.log("This is the access token ", accessToken);
+        console.log("EMAIL AND PASSWORD MATCH!!!!!!!!!!");
         const result = await UserSchema.updateOne(
           //UPDATING THE REFRESH TOKEN IN THE DATABASE
           { email: login },
           { $set: { refreshToken: refreshToken } }
         );
-        console.log(result);
-        console.log("EMAIL AND PASSWORD MATCH!!!!!!!!!!");
-        if (typeof bearerHeader !== "undefined") {
-          //CHECKING IF THERE IS A ACCESSTOKEN IN THE REQUEST HEADER
-          const accessToken = bearerHeader.split(" ")[1];
-          // console.log(accessToken);
-          jwt.verify(accessToken, process.env.LOGIN_SECRET, (err, data) => {
-            //VERIFYING TOKEN WITH SECRET
-            if (err) {
-              res.status(403).json({ message: "Token is invalid or expired" });
-              console.log("Token is Expired"); //TOKEN IS INVALID or EXPIRED
-            } else {
-              console.log("Token Works");
-              res.json({ data: data });
-            }
-          });
-        } else {
-          console.log("No Token provided ");
-          const accessToken = issueToken(login);
-          res.json({ accessToken: accessToken, login: login });
-          // res.status(500).json({ message: "No token provided" });
-        }
+        res
+          .cookie("refreshToken", refreshToken, {
+            //PUTTING IT IN THE COOKIE SO IT IS SECURE
+            httpOnly: true,
+            path: "/refresh_token",
+            secure: true,
+            sameSite: "Strict",
+          })
+          .json({ accessToken: accessToken, login: login });
       } else {
         return res.status(401).json({ err: "Passwords do not match" });
       }
@@ -142,17 +124,18 @@ const loginUser = async (req, res) => {
 
 const verifyRefreshToken = async (req, res) => {
   const refresh_token = req.cookies.refreshToken;
-  // console.log(refresh_token);
+  console.log(refresh_token);
   console.log("Checking if refresh token is in db");
   try {
     const user = await UserSchema.find({ refreshToken: refresh_token });
     console.log("found refresh token");
+    console.log(user);
     // console.log(user[0].email);
     if (user.length !== 0) {
-      const newToken = issueToken(user[0].email);
+      const newToken = issueAccessToken(user[0].email);
       res.json({ accessToken: newToken, user: user });
     } else {
-      console.log("No refresh token matches");
+      console.log("No user is logged in.");
       res.status(500).json({ err: "Wrong Credentials" });
     }
   } catch (error) {

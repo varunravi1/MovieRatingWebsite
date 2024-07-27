@@ -29,6 +29,7 @@ function LoginBox({ onFlip }: Props) {
       }); // SENDING LOGIN INFORMATION TO THE SERVER TO CHECK IF -THE USER EXISTS
       // console.log(response);
       console.log("Re-Logged In");
+      console.log(response);
       updateUser(userLogin.login);
       localStorage.setItem("accessToken", response.data.accessToken);
       setAuthToken(localStorage.getItem("accessToken"));

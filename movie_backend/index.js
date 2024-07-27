@@ -9,6 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const nonUserRoutes = require("./routes/nonUserRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const bodyParser = require("body-parser");
 const Redis = require("redis");
 const redisClient = Redis.createClient();
 redisClient.on("error", (err) => {
@@ -34,6 +35,8 @@ mongoose
   });
 
 //middleware
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use((req, res, next) => {
@@ -41,9 +44,13 @@ app.use((req, res, next) => {
   next();
 });
 const port = 8000;
+
 app.listen(port, () => console.log(`Server is running on ${port}`)); //opens a port at 8000 and listens for requests.
 app.use("/", authRoutes); //uses authRoutes to handle requests to the route in the "" so "/" would be for all requests, "/users" will append link/users/ whatever additional links there are in authRoutes.
 app.use("/user", userRoutes);
 app.use("/homepage", nonUserRoutes);
 app.use("/searchMedia", searchRoutes);
 app.use("/comments", commentRoutes);
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});

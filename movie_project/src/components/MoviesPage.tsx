@@ -77,7 +77,7 @@ function MoviesPage({ selectedMovieGenres }: Props) {
   };
   return (
     <>
-      <div className="flex flex-wrap ml-12">
+      <div className="flex flex-wrap md:ml-6 lg:ml-12">
         {movieData
           ?.filter((movie: Movie) =>
             selectedMovieGenres.length === 0
@@ -88,7 +88,7 @@ function MoviesPage({ selectedMovieGenres }: Props) {
           )
           .map((movie: Movie) => (
             <div
-              className="mt-4 p-2 hover:bg-black-hover cursor-pointer rounded-2xl w-60 h-[340px]"
+              className="mt-4 p-2 hover:bg-black-hover cursor-pointer rounded-2xl w-1/2 lg:w-60 lg:h-[340px]"
               onClick={() => {
                 navigate(
                   `/${movie.original_title ? "movie" : "tv"}/${movie.id}`

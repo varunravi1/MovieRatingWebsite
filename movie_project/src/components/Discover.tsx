@@ -11,13 +11,13 @@ function Discover() {
   const [selectedTVGenres, setSelectedTVGenres] = useState<number[]>([]);
   return (
     <>
-      <div className="main-container shadow-lg min-h-svh">
+      <div className="main-container min-h-screen shadow-lg">
         <NavBarLoggedIn />
         <div className="mt-8">
           <SearchBar />
         </div>
-        <div className="flex mt-2">
-          <div className="mt-4 w-60 min-h-svh shrink-0">
+        <div className="flex-row mt-2 md:flex">
+          <div className="mt-4 w-full md:w-60 shrink-0 sticky top-0">
             <SideBarMedia
               selectedMovieGenres={selectedMovieGenres}
               selectedTVGenres={selectedTVGenres}

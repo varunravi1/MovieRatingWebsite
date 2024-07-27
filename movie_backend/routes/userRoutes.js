@@ -1,5 +1,7 @@
 const express = require("express");
 const axios = require("axios");
+const bodyParser = require("body-parser");
+
 const {
   authenticateUser,
   getLists,
@@ -16,9 +18,21 @@ router.use(
   cors({
     //cors basiaclly authorizes the requests sent from localhost:5173
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://4r8z3n3m-5173.use.devtunnels.ms",
+    ],
   })
 );
+
+// router.use(
+//   cors({
+//     //cors basiaclly authorizes the requests sent from localhost:5173
+//     credentials: true,
+//     origin: "http://localhost:5173",
+//   })
+// );
+
 router.use(authenticateUser);
 router.get("/", (req, res) => {
   if (req.decoded) {

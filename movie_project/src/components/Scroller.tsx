@@ -156,7 +156,7 @@ function Scroller({
   };
   return (
     <>
-      <h1 className="text-white bg-yt-black text-center roboto-bold text-4xl pt-8 tracking-[1px]">
+      <h1 className="text-white bg-yt-black text-center roboto-bold text-xl xl:text-4xl lg:text-4xl md:text-2xl: sm:text-2xl  pt-8 tracking-[1px] ">
         NEW RELEASES
       </h1>
 
@@ -169,17 +169,20 @@ function Scroller({
           <>
             <div className="scroller ">
               {movieData.map((movie, i) => (
-                <div key={movie.id} className="movie-poster-container mr-10">
+                <div
+                  key={movie.id}
+                  className="movie-poster-container md:mr-6 lg:mr-10"
+                >
                   <img
                     onClick={() => {
                       handlePosterClick(movie);
                     }}
                     key={movie.id}
                     src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    className="movie-poster pb-2 cursor-pointer"
+                    className="movie-poster pb-2 cursor-pointer w-48 md:w-52 lg:w-56"
                     // alt={`Poster for ${movie.title}`}
                   />
-                  <div className="overlay-content ml-[100px] mt-40">
+                  <div className="overlay-content ml-[90px] mt-32 md:ml-24 md:mt-36 lg:ml-[100px] lg:mt-40">
                     <img
                       src="public/Rotten_Tomatoes.png"
                       alt="Rotten Tomatoes"
@@ -203,17 +206,20 @@ function Scroller({
             </div>
             <div className="scroller">
               {movieData.map((movie, i) => (
-                <div key={movie.id} className="movie-poster-container mr-10">
+                <div
+                  key={movie.id}
+                  className="movie-poster-container md:mr-6 lg:mr-10"
+                >
                   <img
                     onClick={() => {
                       handlePosterClick(movie);
                     }}
                     key={movie.id}
                     src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    className="movie-poster pb-2 cursor-pointer"
+                    className="movie-poster pb-2 cursor-pointer w-48 md:w-52 lg:w-56"
                     // alt={`Poster for ${movie.title}`}
                   />
-                  <div className="overlay-content ml-[100px] mt-40">
+                  <div className="overlay-content ml-[90px] mt-32 md:ml-24 md:mt-36 lg:ml-[100px] lg:mt-40">
                     <img
                       src="public/Rotten_Tomatoes.png"
                       alt="Rotten Tomatoes"
@@ -224,10 +230,6 @@ function Scroller({
                         ? scoresDict[movie.original_title]
                         : "Not Available"}
                     </p>
-                    {/* <PiBookmarkSimple
-                      onClick={() => handleClickBookmark(movie)}
-                      className="size-9 absolute mt-56 bookmark-icon curso"
-                    /> */}
                     <BookMarkMiddleMan
                       movie={movie}
                       rerenderBookmark={rerenderBookmark}

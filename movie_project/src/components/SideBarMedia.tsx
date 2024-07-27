@@ -1,5 +1,6 @@
 import React from "react";
 import { RiFilterOffFill } from "react-icons/ri";
+import { CiFilter } from "react-icons/ci";
 interface Props {
   setMovieorTV: React.Dispatch<React.SetStateAction<string>>;
   MovieOrTV: string;
@@ -64,90 +65,177 @@ function SideBarMedia({
   };
   const handleResetGenreList = () => {
     if (MovieOrTV === "Movie") {
-      setSelectedMovieGenres([]);
+      if (selectedMovieGenres.length != 0) {
+        setSelectedMovieGenres([]);
+      }
     } else if (MovieOrTV === "TV") {
-      setSelectedTVGenres([]);
+      if (selectedTVGenres.length != 0) {
+        setSelectedTVGenres([]);
+      }
     }
   };
   return (
-    <div className="bg-comp-black text-plat h-full flex flex-col space-y-6 py-4 px-4 roboto-bold rounded-3xl">
-      <div
-        className={` ${
-          MovieOrTV === "Movie"
-            ? "cursor-pointer rounded-lg py-2 pl-2 bg-purp-light"
-            : "cursor-pointer hover:bg-purp rounded-lg py-2 pl-2 active:bg-purp-light"
-        }`}
-        onClick={() => {
-          setMovieorTV("Movie");
-        }}
-      >
-        Movies
+    <>
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex lg:flex bg-comp-black text-plat flex-col space-y-6 py-4 px-4 roboto-bold rounded-3xl sticky top-0">
+        <div
+          className={` ${
+            MovieOrTV === "Movie"
+              ? "cursor-pointer rounded-lg py-2 pl-2 bg-purp-light"
+              : "cursor-pointer hover:bg-purp rounded-lg py-2 pl-2 active:bg-purp-light"
+          }`}
+          onClick={() => {
+            setMovieorTV("Movie");
+          }}
+        >
+          Movies
+        </div>
+        <div
+          className={` ${
+            MovieOrTV === "TV"
+              ? "cursor-pointer rounded-lg py-2 pl-2 bg-purp-light"
+              : "cursor-pointer hover:bg-purp rounded-lg py-2 pl-2 active:bg-purp-light"
+          }`}
+          onClick={() => {
+            setMovieorTV("TV");
+          }}
+        >
+          TV Shows
+        </div>
+        <div className="flex justify-center items-center mt-6 text-lg font-bold text-plat ml-2">
+          Genres
+          <RiFilterOffFill
+            className={`p-1 rounded-full ml-2 ${
+              (MovieOrTV === "Movie" && selectedMovieGenres.length === 0) ||
+              (MovieOrTV === "TV" && selectedTVGenres.length === 0)
+                ? "opacity-30"
+                : "cursor-pointer hover:bg-red-700"
+            }`}
+            onClick={handleResetGenreList}
+            size={30}
+          />
+        </div>
+        <hr />
+        {MovieOrTV === "Movie"
+          ? Object.keys(MovieGenres)
+              .filter((key) => isNaN(Number(key))) // Filter out numeric keys
+              .map((genreName) => {
+                const genreId =
+                  MovieGenres[genreName as keyof typeof MovieGenres];
+                return (
+                  <div
+                    key={genreId}
+                    onClick={() => toggleMovieGenre(genreId)}
+                    className={`rounded-lg py-2 pl-2 ${
+                      selectedMovieGenres.includes(genreId)
+                        ? "bg-purp-light"
+                        : "hover:bg-purp active:bg-purp-light"
+                    }`}
+                  >
+                    {genreName}
+                  </div>
+                );
+              })
+          : Object.keys(TVGenres)
+              .filter((key) => isNaN(Number(key))) // Filter out numeric keys
+              .map((genreName) => {
+                const genreId = TVGenres[genreName as keyof typeof TVGenres];
+                return (
+                  <div
+                    key={genreId}
+                    onClick={() => toggleTVGenre(genreId)}
+                    className={`rounded-lg py-2 pl-2 ${
+                      selectedTVGenres.includes(genreId)
+                        ? "bg-purp-light"
+                        : "hover:bg-purp active:bg-purp-light"
+                    }`}
+                  >
+                    {genreName}
+                  </div>
+                );
+              })}
       </div>
-      <div
-        className={` ${
-          MovieOrTV === "TV"
-            ? "cursor-pointer rounded-lg py-2 pl-2 bg-purp-light"
-            : "cursor-pointer hover:bg-purp rounded-lg py-2 pl-2 active:bg-purp-light"
-        }`}
-        onClick={() => {
-          setMovieorTV("TV");
-        }}
-      >
-        TV Shows
+      {/* Mobile Sidebar */}
+      <div className="md:hidden flex bg-yt-black text-plat justify-center roboto-bold">
+        <div className="flex flex-row items-center justify-center space-x-4">
+          <div
+            className={` ${
+              MovieOrTV === "Movie"
+                ? "cursor-pointer rounded-lg p-2 bg-purp-light"
+                : "cursor-pointer hover:bg-purp rounded-lg p-2 active:bg-purp-light"
+            }`}
+            onClick={() => {
+              setMovieorTV("Movie");
+            }}
+          >
+            Movies
+          </div>
+          <div
+            className={` ${
+              MovieOrTV === "TV"
+                ? "cursor-pointer rounded-lg p-2 bg-purp-light"
+                : "cursor-pointer hover:bg-purp rounded-lg p-2 active:bg-purp-light"
+            }`}
+            onClick={() => {
+              setMovieorTV("TV");
+            }}
+          >
+            TV Shows
+          </div>
+        </div>
       </div>
-      <div className="flex justify-center items-center mt-6 text-lg font-bold text-plat ml-2">
-        Genres
-        <RiFilterOffFill
-          className={`p-1 rounded-full ml-2 ${
+      <div className=" md:hidden flex overflow-x-auto justify-start items-center font-bold bg-yt-black text-plat">
+        <div
+          className={`p-1 rounded-full ml-2 flex justify-center items-center ${
             (MovieOrTV === "Movie" && selectedMovieGenres.length === 0) ||
             (MovieOrTV === "TV" && selectedTVGenres.length === 0)
               ? "opacity-30"
               : "cursor-pointer hover:bg-red-700"
           }`}
           onClick={handleResetGenreList}
-          size={30}
-        />
+        >
+          <RiFilterOffFill size={25} />
+        </div>
+        {MovieOrTV === "Movie"
+          ? Object.keys(MovieGenres)
+              .filter((key) => isNaN(Number(key))) // Filter out numeric keys
+              .map((genreName) => {
+                const genreId =
+                  MovieGenres[genreName as keyof typeof MovieGenres];
+                return (
+                  <div
+                    key={genreId}
+                    onClick={() => toggleMovieGenre(genreId)}
+                    className={`rounded-lg p-2 ${
+                      selectedMovieGenres.includes(genreId)
+                        ? "bg-purp-light"
+                        : "hover:bg-purp active:bg-purp-light"
+                    }`}
+                  >
+                    {genreName}
+                  </div>
+                );
+              })
+          : Object.keys(TVGenres)
+              .filter((key) => isNaN(Number(key))) // Filter out numeric keys
+              .map((genreName) => {
+                const genreId = TVGenres[genreName as keyof typeof TVGenres];
+                return (
+                  <div
+                    key={genreId}
+                    onClick={() => toggleTVGenre(genreId)}
+                    className={`rounded-lg p-2 ${
+                      selectedTVGenres.includes(genreId)
+                        ? "bg-purp-light"
+                        : "hover:bg-purp active:bg-purp-light"
+                    }`}
+                  >
+                    {genreName}
+                  </div>
+                );
+              })}
       </div>
-      <hr />
-      {MovieOrTV === "Movie"
-        ? Object.keys(MovieGenres)
-            .filter((key) => isNaN(Number(key))) // Filter out numeric keys
-            .map((genreName) => {
-              const genreId =
-                MovieGenres[genreName as keyof typeof MovieGenres];
-              return (
-                <div
-                  key={genreId}
-                  onClick={() => toggleMovieGenre(genreId)}
-                  className={`rounded-lg py-2 pl-2 ${
-                    selectedMovieGenres.includes(genreId)
-                      ? "bg-purp-light"
-                      : "hover:bg-purp active:bg-purp-light"
-                  }`}
-                >
-                  {genreName}
-                </div>
-              );
-            })
-        : Object.keys(TVGenres)
-            .filter((key) => isNaN(Number(key))) // Filter out numeric keys
-            .map((genreName) => {
-              const genreId = TVGenres[genreName as keyof typeof TVGenres];
-              return (
-                <div
-                  key={genreId}
-                  onClick={() => toggleTVGenre(genreId)}
-                  className={`rounded-lg py-2 pl-2 ${
-                    selectedTVGenres.includes(genreId)
-                      ? "bg-purp-light"
-                      : "hover:bg-purp active:bg-purp-light"
-                  }`}
-                >
-                  {genreName}
-                </div>
-              );
-            })}
-    </div>
+    </>
   );
 }
 
