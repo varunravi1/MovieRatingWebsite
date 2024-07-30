@@ -14,7 +14,7 @@ function Discover() {
       <div className="main-container min-h-screen shadow-lg">
         <NavBarLoggedIn />
         <div className="mt-8">
-          <SearchBar />
+          <SearchBar enableDropDown={true} />
         </div>
         <div className="flex-row mt-2 md:flex">
           <div className="mt-4 w-full md:w-60 shrink-0 sticky top-0">

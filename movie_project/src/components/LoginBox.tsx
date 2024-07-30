@@ -4,7 +4,7 @@ import { LoginContext } from "../userContext";
 import { useNavigate } from "react-router-dom";
 import { setAuthToken } from "../setAuthToken";
 import ErrorMsg from "./ErrorMsg";
-
+import { v4 as uuidv4 } from "uuid";
 interface Props {
   onFlip: () => void;
 }
@@ -23,9 +23,16 @@ function LoginBox({ onFlip }: Props) {
     try {
       console.log("Inside the login submit handler");
       setAuthToken(localStorage.getItem("accessToken"));
+      let deviceId = localStorage.getItem("deviceId");
+
+      if (!deviceId) {
+        deviceId = uuidv4();
+        localStorage.setItem("deviceId", deviceId as string);
+      }
       const response = await axios.post("/login", {
         login: userLogin.login,
         password: userLogin.password,
+        deviceId: deviceId,
       }); // SENDING LOGIN INFORMATION TO THE SERVER TO CHECK IF -THE USER EXISTS
       // console.log(response);
       console.log("Re-Logged In");

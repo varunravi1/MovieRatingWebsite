@@ -27,10 +27,18 @@ const userSchema = new Schema({
     required: true,
     minlength: true,
   },
-  refreshToken: {
-    type: String,
-    required: false,
-  },
+  refreshToken: [
+    {
+      token: {
+        type: String,
+        required: false,
+      },
+      deviceId: {
+        type: String,
+        required: false,
+      },
+    },
+  ],
 });
 const UserModel = mongoose.model("User", userSchema);
 module.exports = UserModel;

@@ -150,14 +150,14 @@ function MyLists() {
     <>
       <div className="main-container shadow-lg min-h-svh">
         <NavBarLoggedIn></NavBarLoggedIn>
-        <div className="flex pt-2">
-          <div className="mt-4 w-60 min-h-svh shrink-0 sticky">
+        <div className="flex flex-col lg:flex-row pt-2">
+          <div className="mt-4 w-full lg:w-60 lg:min-h-svh sticky top-4 z-40">
             <SideBarLists
               setSelected={setSelected}
               selected={selected}
             ></SideBarLists>
           </div>
-          <div className="w-[80%]">
+          <div className="lg:w-[80%]">
             {listData?.length === 0 ? (
               <>
                 <div
@@ -174,7 +174,7 @@ function MyLists() {
               </>
             ) : (
               <>
-                <div className=" max-h-full mb-3">
+                <div className=" lg:max-h-full mb-3">
                   {listData
                     ?.filter((list: media) => {
                       if (selected == "All") {
@@ -186,7 +186,7 @@ function MyLists() {
                     .map((list: media) => (
                       <div className="" key={list._id}>
                         <div
-                          className=" group roboto-bold relative tracking-wider ml-8 mb-8 mt-4 py-4 pl-4 text-plat text-xl hover:bg-comp-black"
+                          className=" group roboto-bold relative tracking-wider ml-8 mb-4 md:mb-8 mt-4 py-4 pl-4 text-plat text-base md:text-xl hover:bg-comp-black"
                           onClick={() => {
                             // handleAddtoList(list);
                           }}
@@ -202,21 +202,30 @@ function MyLists() {
                           />
                         </div>
                         <div className="flex items-center justify-between">
-                          <IoIosArrowBack
+                          <div
+                            className="cursor-pointer flex-shrink-0 p-1 sm:p-2"
+                            onClick={() => handleScroll(list._id, "left")}
+                          >
+                            <IoIosArrowBack
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12"
+                              color="white"
+                            />
+                          </div>
+                          {/* <IoIosArrowBack
                             size={60}
                             color="white"
                             onClick={() => handleScroll(list._id, "left")}
                             className="cursor-pointer flex-shrink-0"
-                          />
+                          /> */}
                           <div
-                            className="text-whitepx-4 mb-8 flex space-x-16 roboto-regular  overflow-hidden"
+                            className="text-plat px-4 mb-8 flex space-x-4 md:space-x-10 lg:space-x-16 roboto-regular  overflow-y-hidden lg:overflow-x-hidden"
                             // key={list.title}
                             ref={(divElement) =>
                               (scrollPos.current[list._id] = divElement)
                             }
                           >
                             {list.media.map((movie: Movie) => (
-                              <div className="group relative hover:bg-comp-black rounded-2xl flex flex-col items-center p-4 cursor-pointer">
+                              <div className="group relative hover:bg-comp-black rounded-2xl flex flex-col items-center p-2 md:p-4 cursor-pointer">
                                 <div className="opacity-0 group-hover:opacity-100">
                                   <FaTrash
                                     onClick={() => {
@@ -230,24 +239,22 @@ function MyLists() {
                                 <img
                                   key={movie.id}
                                   src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                                  className="max-w-56 rounded-2xl"
+                                  className="w-32 md:w-56 max-w-56 rounded-2xl"
                                   onClick={() => handleMovieClick(movie)}
                                   // alt={`Poster for ${movie.title}`}
                                 />
-                                <p className="mt-6 text-plat">
-                                  {movie.original_title !== null
-                                    ? movie.original_title
-                                    : movie.original_name}
-                                </p>
                               </div>
                             ))}
                           </div>
-                          <IoIosArrowForward
-                            size={60}
-                            color="white"
+                          <div
+                            className="cursor-pointer flex-shrink-0 p-1 sm:p-2"
                             onClick={() => handleScroll(list._id, "right")}
-                            className="cursor-pointer flex-shrink-0 content-end"
-                          />
+                          >
+                            <IoIosArrowForward
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12"
+                              color="white"
+                            />
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -313,7 +320,7 @@ function MyLists() {
                   </select>
                 </div>
 
-                <div className="w-full">
+                <div className="w-full ">
                   <button
                     className="w-full bg-dim-gray hover:bg-yt-black text-plat font-bold py-2 px-4 rounded-md shadow active:scale-95 active:ring-4 ring-purp"
                     onClick={handleCreateList}

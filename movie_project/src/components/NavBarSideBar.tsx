@@ -26,7 +26,7 @@ function NavBarSideBar({ sideBar, setSideBar }: Props) {
     <>
       <div
         ref={refToSideBar}
-        className={`bg-comp-black fixed top-0 left-0 z-50 h-full transition-all overflow-hidden ${
+        className={`z-50 bg-comp-black fixed top-0 left-0 z-50 h-full transition-all overflow-hidden ${
           sideBar ? "w-64" : "w-0"
         }`}
       >

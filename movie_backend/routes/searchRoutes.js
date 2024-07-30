@@ -23,7 +23,7 @@ router.post("/", async (req, res) => {
   //   console.log(req.body.type);
   const type = req.body.type;
   const id = req.body.id;
-  const urlMedia = `https://api.themoviedb.org/3/${type}/${id}?api_key=${process.env.TMDB_API}&append_to_response=credits%2Cvideos%2Cimages`;
+  const urlMedia = `https://api.themoviedb.org/3/${type}/${id}?api_key=${process.env.TMDB_API}&append_to_response=credits%2Cvideos%2Cimages%2Ckeywords`;
   const response = await axios.get(urlMedia);
   res.json(response.data);
   //   console.log(result.data);

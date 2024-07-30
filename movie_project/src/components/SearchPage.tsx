@@ -10,21 +10,18 @@ import "../SearchPage.css";
 import NavBarLoggedIn from "./NavBarLoggedIn";
 import { FaPlay } from "react-icons/fa6";
 import { PiBookmarkSimple, PiBookmarkSimpleFill } from "react-icons/pi";
-import {
-  IoIosAddCircleOutline,
-  IoIosArrowBack,
-  IoIosArrowForward,
-} from "react-icons/io";
 import { ImCancelCircle } from "react-icons/im";
 import axios from "axios";
 import { infinity } from "ldrs";
 import Comments from "./Comments";
 import PopUpLists2 from "./PopUpLists2";
-import { Divider } from "@material-ui/core";
 import { LoginContext } from "../userContext";
-import { useSwipeable } from "react-swipeable";
 import ImageCarousel from "./ImageCarousel";
 import FlipLogin from "./FlipLogin";
+import { MdMovieFilter } from "react-icons/md";
+import { TiTick } from "react-icons/ti";
+import { ImCross } from "react-icons/im";
+
 interface backDrop {
   aspect_ratio: number;
   height: number;
@@ -41,7 +38,14 @@ interface Video {
   name: string;
   type: string;
 }
+interface Keywords {
+  id: number;
+  name: string;
+}
 interface Movie {
+  keywords: {
+    keywords: Keywords[];
+  };
   created_by: any[];
   id: number;
   original_title: string;
@@ -320,6 +324,7 @@ function SearchPage() {
                 ></PiBookmarkSimpleFill>
               )}
             </div>
+
             <hr className="my-5 border-gray-400"></hr>
             <div className="flex space-x-4 pb-6">
               <div className="flex-none">

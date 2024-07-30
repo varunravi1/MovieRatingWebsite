@@ -1,28 +1,95 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useContext,
+  FormEvent,
+} from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
 import { useNavigate } from "react-router-dom";
 import { BsSearch } from "react-icons/bs";
 import FlipLogin from "./FlipLogin";
 import { ImCancelCircle } from "react-icons/im";
+import { SearchContext } from "../SearchContext";
+// interface Movie {
+//   id: number;
+//   original_title: string;
+//   poster_path: string;
+//   release_date: string;
+//   original_language: string;
+//   original_name: string;
+// }
+interface backDrop {
+  aspect_ratio: number;
+  height: number;
+  width: number;
+  file_path: string;
+}
+interface ProductionCompany {
+  id: number;
+  logo_path: string;
+  name: string;
+}
+interface Video {
+  id: string;
+  name: string;
+  type: string;
+}
 interface Movie {
+  genre_ids: any[];
+  created_by: any[];
+  popularity: number;
   id: number;
   original_title: string;
   poster_path: string;
+  backdrop_path: string;
+  homepage: string;
+  budget: number;
+  revenue: number;
+  tagline: string;
+  original_name: string;
+  overview: string;
+  genres: any[];
+  runtime: number;
   release_date: string;
   original_language: string;
-  original_name: string;
+  adult: boolean;
+  credits: {
+    cast: any[];
+    crew: any[];
+  };
+  images: {
+    backdrops: backDrop[];
+  };
+  production_companies: ProductionCompany[];
+  director: string;
+  videos: {
+    results: Video[];
+  };
+  trailer: any;
+  first_air_date: string;
+  last_air_date: string;
+  audienceScore: string;
+  criticScore: string;
+  status: string;
 }
-
-function SearchBar() {
+interface Props {
+  enableDropDown: boolean;
+}
+function SearchBar({ enableDropDown }: Props) {
   const navigate = useNavigate();
   const [searchResult, setSearchResult] = useState<any[]>([]);
+  const { setSearchResults } = useContext(SearchContext);
   const [search, updateSearch] = useState("");
+  const allSearch = useRef<Movie[]>([]);
   useEffect(() => {
     if (search === "") {
       setSearchResult([]);
     }
   }, [search]);
+
   const handleDebounceChange = useCallback(
     debounce(async (inputValue: string) => {
       axios
@@ -35,6 +102,9 @@ function SearchBar() {
               .slice(0, 2)
               .concat(response.data.tv.results.slice(0, 2))
           );
+          allSearch.current = response.data.movies.results
+            .concat(response.data.tv.results)
+            .sort((a: Movie, b: Movie) => b.popularity - a.popularity);
         })
         .catch((error) => {
           console.log(error);
@@ -51,8 +121,12 @@ function SearchBar() {
   const handleSearchClick = (movie: Movie) => {
     navigate(`/${movie.original_title ? "movie" : "tv"}/${movie.id}`);
   };
-  const handleSearchEnter = () => {};
-  //   const debouncedOnChange = debounce(handleSearch, 500);
+  const handleSearchEnter = (event: FormEvent) => {
+    event.preventDefault();
+
+    setSearchResults(allSearch.current);
+    navigate(`/searchresults`);
+  };
   return (
     <>
       <div>
@@ -77,34 +151,36 @@ function SearchBar() {
             </button>
           </div>
         </form>
-        <div className="search-results w-72 md:w-full bg-transparent cursor-pointer mt-2 rounded-2xl overflow-hidden overflow-y-hidden ">
-          {searchResult != null ? (
-            <>
-              {searchResult.map((movie: Movie) => (
-                <div
-                  key={movie.id}
-                  className="bg-yt-black space-x-2 search-container hover:bg-slate-950"
-                  onClick={() => {
-                    handleSearchClick(movie);
-                  }}
-                >
-                  <img
+        {enableDropDown && (
+          <div className="search-results w-72 md:w-full bg-transparent cursor-pointer mt-2 rounded-2xl overflow-hidden overflow-y-hidden ">
+            {searchResult != null ? (
+              <>
+                {searchResult.map((movie: Movie) => (
+                  <div
                     key={movie.id}
-                    src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    className="w-20 mx-2 rounded-xl pb-1"
-                  ></img>
-                  <div className="mr-2 text-white roboto-regular ">
-                    {movie.original_title
-                      ? movie.original_title
-                      : movie.original_name}
+                    className="bg-yt-black space-x-2 search-container hover:bg-slate-950"
+                    onClick={() => {
+                      handleSearchClick(movie);
+                    }}
+                  >
+                    <img
+                      key={movie.id}
+                      src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                      className="w-20 mx-2 rounded-xl pb-1"
+                    ></img>
+                    <div className="mr-2 text-white roboto-regular ">
+                      {movie.original_title
+                        ? movie.original_title
+                        : movie.original_name}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </>
-          ) : (
-            <></>
-          )}
-        </div>
+                ))}
+              </>
+            ) : (
+              <></>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

@@ -41,20 +41,6 @@ router.get("/", (req, res) => {
     res.json("Token Is Wrong");
   }
 });
-router.get("/scroll", async (req, res) => {
-  const query = "Jack+Reacher";
-  try {
-    const response = await axios.get(
-      `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
-        query
-      )}&api_key=${process.env.TMDB_API}`
-    );
-    console.log(response.data);
-  } catch (error) {
-    console.error("Failed to fetch data from api");
-  }
-});
-// router.get("/", returnUser);
 router.get("/time_left", (req, res) => {
   try {
     if (typeof bearerHeader !== "undefined") {

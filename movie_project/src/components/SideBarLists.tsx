@@ -21,28 +21,54 @@ function SideBarLists({ selected, setSelected }: Props) {
   };
 
   return (
-    <div className="bg-comp-black text-plat h-full flex flex-col space-y-6 py-4 px-4 roboto-bold rounded-3xl">
-      <div
-        className={` ${
-          selected === "Movie"
-            ? "cursor-pointer rounded-lg py-2 pl-2 bg-purp-light"
-            : "cursor-pointer hover:bg-purp rounded-lg py-2 pl-2 active:bg-purp-light"
-        }`}
-        onClick={handleClickMovies}
-      >
-        Movies
+    <>
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex bg-comp-black text-plat h-full flex-col space-y-6 py-4 px-4 roboto-bold rounded-3xl">
+        <div
+          className={` ${
+            selected === "Movie"
+              ? "cursor-pointer rounded-lg py-2 pl-2 bg-purp-light"
+              : "cursor-pointer hover:bg-purp rounded-lg py-2 pl-2 active:bg-purp-light"
+          }`}
+          onClick={handleClickMovies}
+        >
+          Movies
+        </div>
+        <div
+          className={` ${
+            selected === "TV"
+              ? "cursor-pointer rounded-lg py-2 pl-2 bg-purp-light"
+              : "cursor-pointer hover:bg-purp rounded-lg py-2 pl-2 active:bg-purp-light"
+          }`}
+          onClick={handleClickTVShows}
+        >
+          TV Shows
+        </div>
       </div>
-      <div
-        className={` ${
-          selected === "TV"
-            ? "cursor-pointer rounded-lg py-2 pl-2 bg-purp-light"
-            : "cursor-pointer hover:bg-purp rounded-lg py-2 pl-2 active:bg-purp-light"
-        }`}
-        onClick={handleClickTVShows}
-      >
-        TV Shows
+      {/* Mobile Sidebar */}
+      <div className="lg:hidden flex items-center bg-yt-black text-plat justify-center space-x-20 py-4 roboto-bold rounded-3xl">
+        <div
+          className={`md:text-xl p-2${
+            selected === "Movie"
+              ? "cursor-pointer rounded-lg bg-purp-light"
+              : "cursor-pointer hover:bg-purp rounded-lg  active:bg-purp-light"
+          }`}
+          onClick={handleClickMovies}
+        >
+          Movies
+        </div>
+        <div
+          className={`md:text-xl p-2 ${
+            selected === "TV"
+              ? "cursor-pointer rounded-lg bg-purp-light"
+              : "cursor-pointer hover:bg-purp rounded-lg active:bg-purp-light"
+          }`}
+          onClick={handleClickTVShows}
+        >
+          TV Shows
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

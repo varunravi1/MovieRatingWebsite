@@ -24,7 +24,7 @@ function HomePage() {
       <div className="main-container shadow-lg min-h-svh">
         <NavBarLoggedIn />
         <div className="mt-8">
-          <SearchBar></SearchBar>
+          <SearchBar enableDropDown={true} />
         </div>
 
         <div className="">

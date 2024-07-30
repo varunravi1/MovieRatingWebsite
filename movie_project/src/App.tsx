@@ -14,6 +14,8 @@ import MyLists from "./components/MyLists";
 import MoviesPage from "./components/MoviesPage";
 import Discover from "./components/Discover";
 import ActorPage from "./components/ActorPage";
+import { SearchProvider } from "./SearchContext";
+import SearchResults from "./components/SearchResults";
 
 axios.defaults.withCredentials = true;
 let router = createBrowserRouter([
@@ -41,15 +43,21 @@ let router = createBrowserRouter([
     path: "/discover",
     element: <Discover />,
   },
+  {
+    path: "/searchresults",
+    element: <SearchResults />,
+  },
 ]);
 function App() {
   return (
     <>
       <UserContext>
-        <RouterProvider
-          router={router}
-          fallbackElement={<p>Loading..</p>}
-        ></RouterProvider>
+        <SearchProvider>
+          <RouterProvider
+            router={router}
+            fallbackElement={<p>Loading..</p>}
+          ></RouterProvider>
+        </SearchProvider>
       </UserContext>
     </>
   );

@@ -4,6 +4,7 @@ import ErrorMsg from "./ErrorMsg";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { LoginContext } from "../userContext";
+import { v4 as uuidv4 } from "uuid";
 interface Props {
   onFlip: () => void;
 }
@@ -46,11 +47,18 @@ function CreateAccountBox({ onFlip }: Props) {
           email: userData.email,
         });
         console.log(check);
+        let deviceId = localStorage.getItem("deviceId");
+
+        if (!deviceId) {
+          deviceId = uuidv4();
+          localStorage.setItem("deviceId", deviceId as string);
+        }
         const response = await axios.post("/register", {
           username: userData.username,
           email: userData.email,
           age: Number(userData.dob),
           password: userData.password,
+          deviceId: deviceId,
         });
 
         // const response = await axios.post("/login", {

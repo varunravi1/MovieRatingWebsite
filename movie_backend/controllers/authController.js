@@ -2,6 +2,7 @@ const UserSchema = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieparser = require("cookie-parser");
+
 const hashFunc = (password) => {
   return new Promise((resolve, reject) => {
     bcrypt.genSalt(12, (err, salt) => {
@@ -29,7 +30,7 @@ const issueAccessToken = (data) => {
 //REGISTERING USER
 const registerUser = async (req, res) => {
   try {
-    const { username, email, age, password } = req.body;
+    const { username, email, age, password, deviceId } = req.body;
     const emailExists = await UserSchema.findOne({ email });
     if (!email || emailExists) {
       return res.json({
@@ -49,12 +50,21 @@ const registerUser = async (req, res) => {
       email,
       age,
       password: pass,
-      refreshToken: refreshToken,
+      refreshToken: {
+        token: refreshToken,
+        deviceId: deviceId,
+      },
     });
     console.log("Response from creating the user");
     console.log(user.id);
     res
       .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        path: "/refresh_token",
+        secure: true,
+        sameSite: "Strict",
+      })
+      .cookie("deviceId", deviceId, {
         httpOnly: true,
         path: "/refresh_token",
         secure: true,
@@ -68,12 +78,12 @@ const registerUser = async (req, res) => {
 
 //LOGIN USER
 const loginUser = async (req, res) => {
-  const bearerHeader = req.headers["authorization"];
+  // const bearerHeader = req.headers["authorization"];
   // const refresh_token = req.cookies.refreshToken;
   // console.log("refresh tk");
   // console.log(refresh_token);
   try {
-    const { login, password } = req.body; //EXTRACTS EMAIL AND PASSWORD FROM JSON PAYLOAD
+    const { login, password, deviceId } = req.body; //EXTRACTS EMAIL AND PASSWORD FROM JSON PAYLOAD
     // console.log(email);
     // console.log(password);
     const isValidEmail = await UserSchema.findOne(
@@ -99,14 +109,39 @@ const loginUser = async (req, res) => {
         const accessToken = issueAccessToken(login);
         console.log("This is the access token ", accessToken);
         console.log("EMAIL AND PASSWORD MATCH!!!!!!!!!!");
-        const result = await UserSchema.updateOne(
-          //UPDATING THE REFRESH TOKEN IN THE DATABASE
-          { email: login },
-          { $set: { refreshToken: refreshToken } }
+        // First, attempt to update the existing refresh token for the given device ID
+        const updateResult = await UserSchema.updateOne(
+          { email: login, "refreshToken.deviceId": deviceId },
+          { $set: { "refreshToken.$.token": refreshToken } }
         );
+
+        // Debugging: Log the result of the update operation
+        console.log("Update result:", updateResult);
+
+        // If no document was modified, it means the device ID was not found
+        if (updateResult.modifiedCount === 0) {
+          const result = await UserSchema.updateOne(
+            { email: login },
+            {
+              $push: {
+                refreshToken: { token: refreshToken, deviceId: deviceId },
+              },
+            }
+          );
+
+          // Debugging: Log the result of the push operation
+          console.log("Push result:", result);
+        }
+
         res
           .cookie("refreshToken", refreshToken, {
             //PUTTING IT IN THE COOKIE SO IT IS SECURE
+            httpOnly: true,
+            path: "/refresh_token",
+            secure: true,
+            sameSite: "Strict",
+          })
+          .cookie("deviceId", deviceId, {
             httpOnly: true,
             path: "/refresh_token",
             secure: true,
@@ -124,14 +159,22 @@ const loginUser = async (req, res) => {
 
 const verifyRefreshToken = async (req, res) => {
   const refresh_token = req.cookies.refreshToken;
+  const deviceId = req.cookies.deviceId;
   console.log(refresh_token);
   console.log("Checking if refresh token is in db");
   try {
-    const user = await UserSchema.find({ refreshToken: refresh_token });
+    const user = await UserSchema.findOne({
+      refreshToken: {
+        $elemMatch: {
+          token: refresh_token,
+          deviceId: deviceId,
+        },
+      },
+    });
     console.log("found refresh token");
     console.log(user);
     // console.log(user[0].email);
-    if (user.length !== 0) {
+    if (user) {
       const newToken = issueAccessToken(user[0].email);
       res.json({ accessToken: newToken, user: user });
     } else {
@@ -149,7 +192,10 @@ const updateRefreshToken = async (req, res) => {};
 const deleteRefreshToken = async (req, res) => {
   // Assuming refreshToken is stored in an HttpOnly cookie
   const token = req.cookies.refreshToken;
+  const deviceId = req.cookies.deviceId; // Make sure to get the deviceId from cookies or req.body if needed
+
   try {
+    // Clear the refresh token cookie
     res.clearCookie("refreshToken", {
       path: "/refresh_token",
       httpOnly: true,
@@ -157,14 +203,22 @@ const deleteRefreshToken = async (req, res) => {
       sameSite: "Strict",
     });
 
-    await UserSchema.updateOne(
-      { refreshToken: token },
-      { $set: { refreshToken: "" } }
+    // Remove the refresh token associated with the deviceId from the database
+    const result = await UserSchema.updateOne(
+      { "refreshToken.deviceId": deviceId },
+      { $pull: { refreshToken: { deviceId: deviceId } } }
     );
-    console.log("logged out successfully");
-    res.status(200).json({ message: "logged out successfully" });
+
+    if (result.nModified === 0) {
+      console.log(`No token found for device ID: ${deviceId}`);
+    } else {
+      console.log("Logged out successfully");
+    }
+
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    res.status(5000).json({ message: "error during logout" });
+    console.error("Error during logout:", error);
+    res.status(500).json({ message: "Error during logout" });
   }
 };
 

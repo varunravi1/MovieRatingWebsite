@@ -102,7 +102,7 @@ function ImageCarousel({ scrollPos, data, type }: Props) {
       />
       <div
         ref={(divElement) => (scrollPos.current[whichSet] = divElement)}
-        className="flex items-center space-x-4 overflow-x-auto justify-between"
+        className="flex items-center space-x-4 overflow-x-auto lg:overflow-x-hidden overflow-y-hidden justify-between"
       >
         {data?.map((cast: any) => (
           <div
