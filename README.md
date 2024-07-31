@@ -47,8 +47,6 @@ The project successfully delivered a feature-rich, user-friendly movie rating pl
 
 
 
-https://github.com/user-attachments/assets/fd6e045e-384c-491b-ba5c-921d1310b200
-
 
 
 https://github.com/user-attachments/assets/b1f29213-d4fe-4043-b696-a5a103310a6b
