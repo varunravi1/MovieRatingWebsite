@@ -8,12 +8,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 interface Props {
-  setListScreen: (variable: boolean) => void;
   mediaData: React.MutableRefObject<Movie | null>;
-  setrerenderBookmark: (variable: boolean) => void;
-  rerenderBookmark: boolean;
-  // setrerenderListScreen: (variable: boolean) => void;
-  // rerenderListScreen: boolean;
+  setListScreen: React.Dispatch<React.SetStateAction<boolean>>;
+  updateMovieInList: (movieId: number) => void;
+  type: "movie" | "tv";
 }
 interface Movie {
   id: number;
@@ -21,6 +19,7 @@ interface Movie {
   poster_path: string;
   release_date: string;
   original_language: string;
+  in_list: Boolean;
 }
 interface media {
   _id: string;
@@ -29,10 +28,10 @@ interface media {
   media: {};
 }
 function PopUpLists({
-  setListScreen,
   mediaData,
-  rerenderBookmark,
-  setrerenderBookmark,
+  setListScreen,
+  updateMovieInList,
+  type,
 }: Props) {
   const { user } = useContext(LoginContext);
   const [listData, setListData] = useState<any[] | null>([]);
@@ -72,9 +71,11 @@ function PopUpLists({
     } catch (error) {}
   };
   const handleAddtoList = async (list: media) => {
-    if (list.mediaType == "TV") {
+    if (list.mediaType.toLowerCase() !== type) {
       toast.error(
-        "Cannot add a movie to a TV List!! Please try another or create a list!"
+        `Cannot add a ${type === "movie" ? "Movie" : "TV Show"} to a ${
+          type === "movie" ? "TV Show" : "Movie"
+        } List. Please try another or create a list!`
       );
     } else {
       try {
@@ -86,8 +87,10 @@ function PopUpLists({
           mediaItem: mediaData.current,
         });
         console.log(result);
+        if (mediaData.current) {
+          updateMovieInList(mediaData.current.id);
+        }
         setListScreen(false);
-        setrerenderBookmark(!rerenderBookmark);
       } catch (error) {}
     }
   };
@@ -103,7 +106,7 @@ function PopUpLists({
               setListScreen(false);
             }}
           ></ImCancelCircle>
-          <div className="ml-8 my-8 roboto-bold tracking-wide">Your Lists</div>
+          <div className="ml-8 my-8 mukta-bold tracking-wide">Your Lists</div>
           {listData?.length === 0 ? (
             <>
               <div
@@ -124,7 +127,7 @@ function PopUpLists({
                 {listData?.map((list: media) => (
                   <div className="" key={list._id}>
                     <div
-                      className=" flex items-center justify-between roboto-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-black-hover active:scale-95 active:ring-4 ring-purp overflow-auto"
+                      className=" flex items-center justify-between mukta-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-black-hover active:scale-95 active:ring-4 ring-purp overflow-auto"
                       onClick={() => {
                         handleAddtoList(list);
                       }}

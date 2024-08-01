@@ -126,8 +126,8 @@ function ImageCarousel({ scrollPos, data, type }: Props) {
             ></img>
             {cast.name && cast.character && (
               <>
-                <h1 className="roboto-regular text-base ">{cast.name}</h1>
-                <p className="roboto-light text-xs ">{cast.character}</p>
+                <h1 className="mukta-regular text-base ">{cast.name}</h1>
+                <p className="mukta-light text-xs ">{cast.character}</p>
               </>
             )}
           </div>

@@ -152,7 +152,7 @@ function PopUpLists2({ tvormov, setPopUpLists, setBookMarkValue }: Props) {
               setPopUpLists(false);
             }}
           ></ImCancelCircle>
-          <div className="ml-8 my-8 roboto-bold tracking-wide">Your Lists</div>
+          <div className="ml-8 my-8 mukta-bold tracking-wide">Your Lists</div>
           {listData?.length === 0 ? (
             <>
               <div
@@ -180,7 +180,7 @@ function PopUpLists2({ tvormov, setPopUpLists, setBookMarkValue }: Props) {
                   .map((list: media) => (
                     <div className="" key={list._id}>
                       <div
-                        className="roboto-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-black-hover active:scale-95 active:ring-4 ring-purp overflow-auto"
+                        className="mukta-bold tracking-wider px-4 mx-14 mb-6 py-4 text-plat cursor-pointer bg-yt-black rounded-2xl hover:bg-black-hover active:scale-95 active:ring-4 ring-purp overflow-auto"
                         onClick={() => {
                           handleAddtoList(list);
                         }}

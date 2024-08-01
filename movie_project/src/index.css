@@ -86,7 +86,7 @@ body {
 
 .scroller {
   white-space: nowrap;
-  animation: 100s slide infinite linear;
+  animation: 200s slide infinite linear;
 }
 .movie-poster-container:hover .movie-poster {
   filter: blur(5px) brightness(80%);
@@ -111,11 +111,27 @@ body {
     transform: translateX(-100%);
   }
 }
+/* Add this to your CSS file or inside a <style> tag in your component */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
 
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #2d2d2d; /* Dark background for track */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888; /* Gray color for thumb */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Darker gray on hover */
+}
 .search-results {
   position: absolute;
   /* width: max-width; */
-  overflow-y: auto;
   /* background: white; */
   z-index: 1000;
 }

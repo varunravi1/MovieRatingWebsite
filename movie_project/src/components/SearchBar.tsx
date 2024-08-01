@@ -141,10 +141,10 @@ function SearchBar({ enableDropDown }: Props) {
               onChange={handleSearch}
               placeholder="Search for movie/show"
               type="search"
-              className="flex w-full outline-none border-none bg-transparent ml-2  px-2 caret-yt-black text-yt-black roboto-regular"
+              className="flex w-full outline-none border-none bg-transparent ml-2  px-2 caret-yt-black text-yt-black mukta-regular"
             />
             <button
-              className="bg-purp-light w-52 h-full rounded-3xl py-3 transition-all hover:scale-105 hover:bg-purp active:shadow-inner focus:shadow-inner roboto-regular"
+              className="bg-purp-light w-52 h-full rounded-3xl py-3 transition-all hover:scale-105 hover:bg-purp active:shadow-inner focus:shadow-inner mukta-regular"
               type="submit"
             >
               Search
@@ -168,7 +168,7 @@ function SearchBar({ enableDropDown }: Props) {
                       src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
                       className="w-20 mx-2 rounded-xl pb-1"
                     ></img>
-                    <div className="mr-2 text-white roboto-regular ">
+                    <div className="mr-2 text-white mukta-regular ">
                       {movie.original_title
                         ? movie.original_title
                         : movie.original_name}

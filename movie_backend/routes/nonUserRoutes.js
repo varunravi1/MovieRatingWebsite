@@ -2,7 +2,8 @@ const express = require("express");
 const axios = require("axios");
 const {
   scraper,
-  requestScroller,
+  requestScrollerMovie,
+  requestScrollerTV,
   searchFunc,
   getMovies,
   getTV,
@@ -30,7 +31,8 @@ router.use(
 //   })
 // );
 router.post("/scores", scraper);
-router.get("/scroller", requestScroller);
+router.get("/scroller/movie", requestScrollerMovie);
+router.get("/scroller/tv", requestScrollerTV);
 router.post("/search", searchFunc);
 router.post("/movies", getMovies);
 router.post("/tv", getTV);

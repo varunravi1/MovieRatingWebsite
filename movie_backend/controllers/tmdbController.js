@@ -11,7 +11,7 @@ const streamAPI = new streamingAvailability.Client(
   })
 );
 // await client.connect();
-const requestScroller = async (req, res) => {
+const requestScrollerMovie = async (req, res) => {
   try {
     console.log("inside the scroller func");
     const data = await req.redisClient.get("new-release");
@@ -22,15 +22,11 @@ const requestScroller = async (req, res) => {
     } else {
       console.log("cache missed");
       const response1 = await axios.get(
-        `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
-          "2024-03-01"
-        )}&api_key=${process.env.TMDB_API}&page=1`
+        `https://api.themoviedb.org/3/movie/now_playing?language=en-US&api_key=${process.env.TMDB_API}&page=1`
       );
       console.log("API Hit in MovieScroller");
       const response2 = await axios.get(
-        `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&with_release_type=3|4|6&release_date.gte=${new Date(
-          "2024-03-01"
-        )}&api_key=${process.env.TMDB_API}&page=2`
+        `https://api.themoviedb.org/3/movie/now_playing?language=en-US&api_key=${process.env.TMDB_API}&page=2`
       );
       const combinedResults = {
         ...response1.data, // This spreads the first response object properties
@@ -44,6 +40,51 @@ const requestScroller = async (req, res) => {
   } catch (error) {
     console.log("Something went wrong with api request");
     res.status(404).json({ error: "invalid request" });
+  }
+};
+const requestScrollerTV = async (req, res) => {
+  try {
+    console.log("Inside the TV scroller function");
+
+    const data = await req.redisClient.get("on-air-tv");
+    if (data != null) {
+      console.log("Cache Hit");
+      // console.log("These are the cached TV results:", JSON.parse(data));
+      return res.json(JSON.parse(data));
+    } else {
+      console.log("Cache Missed");
+
+      // console.log("Making first API call");
+      const response1 = await axios.get(
+        `https://api.themoviedb.org/3/tv/on_the_air?language=en-US&api_key=${process.env.TMDB_API}&page=1`
+      );
+      // console.log("First API call successful");
+
+      // console.log("Making second API call");
+      const response2 = await axios.get(
+        `https://api.themoviedb.org/3/tv/on_the_air?language=en-US&api_key=${process.env.TMDB_API}&page=2`
+      );
+      // console.log("Second API call successful");
+
+      const combinedResults = {
+        ...response1.data,
+        results: [...response1.data.results, ...response2.data.results],
+      };
+      // console.log("These are the combined TV results:", combinedResults);
+
+      res.json(combinedResults);
+
+      // console.log("Saving results to cache");
+      await req.redisClient.set("on-air-tv", JSON.stringify(combinedResults), {
+        EX: WEEK_EXPIRATION,
+      });
+      // console.log("Results saved to cache");
+    }
+  } catch (error) {
+    console.error("Something went wrong with the API request", error);
+    res
+      .status(404)
+      .json({ error: "Invalid request inside TV scroller function" });
   }
 };
 const logStringDetails = (str) => {
@@ -143,16 +184,13 @@ const countUnderscores = (str) => {
 };
 const scraper = async (req, res) => {
   const year = req.body.date.split("-")[0];
-  //   console.log(req.body);
   console.log("In Scraper Function");
-  //   console.log(req.redisClient);
+
   try {
-    // console.log(`rt-audienceScore-${req.body.url}`);
     const scores = await req.redisClient.mGet([
       `rt-audienceScore-${req.body.url}`,
       `rt-criticScore-${req.body.url}`,
     ]);
-    // console.log(scores);
     console.log("inside mget");
     if (scores[0] != null && scores[1] != null) {
       console.log("Scores Cache Hit");
@@ -171,7 +209,6 @@ const scraper = async (req, res) => {
       const underscores = countUnderscores(req.body.url);
       if (underscores > 3) {
         await delay(Math.random() * 2000);
-        // console.log(req.body.url);
         searchForScores(req.body.url, year)
           .then(async (result) => {
             await req.redisClient.set(
@@ -208,10 +245,8 @@ const scraper = async (req, res) => {
                 EX: WEEK_EXPIRATION,
               }
             );
-            //   res.status(500).json({ err: error });
             res.json({ error: "unavailable on rotten tomatoes." });
           });
-        // console.log(score);
       } else {
         await delay(Math.random() * 2000);
         const searchLink = await searchRottenTomatoes(req.body.title, year);
@@ -238,14 +273,41 @@ const scraper = async (req, res) => {
                 audienceScore: result.audienceScore,
               });
             })
-            .catch((error) => {
-              res.staus(500).json({ err: error });
+            .catch(async (error) => {
+              await req.redisClient.set(
+                `rt-audienceScore-${req.body.url}`,
+                JSON.stringify("Not Available"),
+                {
+                  EX: WEEK_EXPIRATION,
+                }
+              );
+              await req.redisClient.set(
+                `rt-criticScore-${req.body.url}`,
+                JSON.stringify("Not Available"),
+                {
+                  EX: WEEK_EXPIRATION,
+                }
+              );
+              res.json({ error: "unavailable on rotten tomatoes." });
             });
         } else {
+          await req.redisClient.set(
+            `rt-audienceScore-${req.body.url}`,
+            JSON.stringify("Not Available"),
+            {
+              EX: WEEK_EXPIRATION,
+            }
+          );
+          await req.redisClient.set(
+            `rt-criticScore-${req.body.url}`,
+            JSON.stringify("Not Available"),
+            {
+              EX: WEEK_EXPIRATION,
+            }
+          );
           res.json({ error: "unavailable on rotten tomatoes." });
         }
       }
-      //}
     }
   } catch (error) {
     console.error("Error fetching data: ", error);
@@ -424,7 +486,8 @@ const getActorInformation = async (req, res) => {
 };
 
 module.exports = {
-  requestScroller,
+  requestScrollerMovie,
+  requestScrollerTV,
   scraper,
   delay,
   searchFunc,

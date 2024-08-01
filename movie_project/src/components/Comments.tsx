@@ -147,7 +147,7 @@ function Comments({ movie }: Props) {
   };
   return (
     <div id="search-comment" className="mt-6 ">
-      <p className="roboto-bold my-4 md:text-lg lg:text-xl">Comments</p>
+      <p className="mukta-bold my-4 md:text-lg lg:text-xl">Comments</p>
 
       <div className="bg-plat rounded-lg">
         <textarea
@@ -166,7 +166,7 @@ function Comments({ movie }: Props) {
       {isFocused && (
         <div className="w-full flex justify-end items-center ">
           <button
-            className="roboto-bold my-4 mx-4 px-4 py-2 rounded-xl bg-comp-black hover:bg-plat hover:text-comp-black"
+            className="mukta-bold my-4 mx-4 px-4 py-2 rounded-xl bg-comp-black hover:bg-plat hover:text-comp-black"
             onClick={() => {
               updateComment("");
               setIsFocused(false);
@@ -175,7 +175,7 @@ function Comments({ movie }: Props) {
             Cancel
           </button>
           <button
-            className="roboto-bold my-4 mx-4 px-4 py-2 rounded-xl bg-comp-black hover:bg-plat hover:text-comp-black"
+            className="mukta-bold my-4 mx-4 px-4 py-2 rounded-xl bg-comp-black hover:bg-plat hover:text-comp-black"
             onClick={handleAddComment}
           >
             Submit
@@ -204,9 +204,7 @@ function Comments({ movie }: Props) {
           ))
       ) : (
         <div className="flex items-center justify-center pt-6 h-60">
-          <p className="roboto-regular">
-            No Comments. Be the first to comment!
-          </p>
+          <p className="mukta-regular">No Comments. Be the first to comment!</p>
         </div>
       )}
       {login && (

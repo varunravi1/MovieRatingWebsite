@@ -277,7 +277,7 @@ function SearchPage() {
                 backgroundImage: `url(https://image.tmdb.org/t/p/original/${movieData?.backdrop_path})`,
               }}
             >
-              <h1 className=" absolute left-5 bottom-20 md:left-8 lg:left-10 text-base md:text-lg lg:text-xl roboto-regular tracking-wider ">
+              <h1 className=" absolute left-5 bottom-20 md:left-8 lg:left-10 text-base md:text-lg lg:text-xl mukta-regular tracking-wider ">
                 {mediaType === "tv"
                   ? movieData?.original_name
                   : movieData?.original_title}{" "}
@@ -301,7 +301,7 @@ function SearchPage() {
                 <div className="absolute left-5 md:left-8 lg:left-10 bottom-4 bg-yt-black rounded-3xl flex items-center pl-2 buttons">
                   <FaPlay />
                   <button
-                    className="px-3 py-1 roboto-regular tracking-wide text-xs md:text-sm lg:text-base"
+                    className="px-3 py-1 mukta-regular tracking-wide text-xs md:text-sm lg:text-base"
                     onClick={() => {
                       setTrailer(true);
                     }}
@@ -335,7 +335,7 @@ function SearchPage() {
                 />
               </div>
               <div className="">
-                <div className="hidden md:flex text-xs md:text-base items-center roboto-bold space-x-4 pb-2">
+                <div className="hidden md:flex text-xs md:text-base items-center mukta-bold space-x-4 pb-2">
                   <p className="tracking-wide">
                     {mediaType === "tv"
                       ? movieData &&
@@ -356,7 +356,7 @@ function SearchPage() {
                       </>
                     ))}
                 </div>
-                <div className="block md:hidden text-xs md:text-base items-center roboto-bold pb-2 tracking-wide text-start">
+                <div className="block md:hidden text-xs md:text-base items-center mukta-bold pb-2 tracking-wide text-start">
                   <p className="pb-1">
                     {mediaType === "tv"
                       ? movieData &&
@@ -376,7 +376,7 @@ function SearchPage() {
                       </>
                     ))}
                 </div>
-                <p className="roboto-regular mb-6 text-sm lg:text-base tracking-wide md:tracking-normal lg:tracking-normal">
+                <p className="mukta-regular mb-6 text-sm lg:text-base tracking-wide md:tracking-normal lg:tracking-normal">
                   {movieData?.overview}
                 </p>
                 <div className="hidden lg:flex items-center justify-between w-full">
@@ -391,14 +391,14 @@ function SearchPage() {
                         ratingList?.ratings
                           ?.filter((rating) => rating.source === "tomatoes")
                           .map((rating, index) => (
-                            <p key={index} className="roboto-bold text-red-400">
+                            <p key={index} className="mukta-bold text-red-400">
                               {rating.value === null
                                 ? "Not Found"
                                 : rating.value + "%"}
                             </p>
                           ))
                       ) : (
-                        <p className="roboto-bold text-red-400">
+                        <p className="mukta-bold text-red-400">
                           {movieData?.criticScore}
                         </p>
                       )}
@@ -415,14 +415,14 @@ function SearchPage() {
                             (rating) => rating.source === "tomatoesaudience"
                           )
                           .map((rating, index) => (
-                            <p key={index} className="roboto-bold text-red-400">
+                            <p key={index} className="mukta-bold text-red-400">
                               {rating.value === null
                                 ? "Not Found"
                                 : rating.value + "%"}
                             </p>
                           ))
                       ) : (
-                        <p className="roboto-bold text-red-400">
+                        <p className="mukta-bold text-red-400">
                           {movieData?.audienceScore}
                         </p>
                       )}
@@ -439,13 +439,13 @@ function SearchPage() {
                           .map((rating, index) => (
                             <p
                               key={index}
-                              className="roboto-bold text-yellow-500"
+                              className="mukta-bold text-yellow-500"
                             >
                               {rating.value + "/10"}
                             </p>
                           ))
                       ) : (
-                        <p className="roboto-bold text-yellow-500">Not Found</p>
+                        <p className="mukta-bold text-yellow-500">Not Found</p>
                       )}
                     </div>
                   </div>
@@ -482,14 +482,14 @@ function SearchPage() {
                     ratingList?.ratings
                       ?.filter((rating) => rating.source === "tomatoes")
                       .map((rating, index) => (
-                        <p key={index} className="roboto-bold text-red-400">
+                        <p key={index} className="mukta-bold text-red-400">
                           {rating.value === null
                             ? "Not Found"
                             : rating.value + "%"}
                         </p>
                       ))
                   ) : (
-                    <p className="roboto-bold text-red-400">
+                    <p className="mukta-bold text-red-400">
                       {movieData?.criticScore}
                     </p>
                   )}
@@ -504,14 +504,14 @@ function SearchPage() {
                     ratingList?.ratings
                       .filter((rating) => rating.source === "tomatoesaudience")
                       .map((rating, index) => (
-                        <p key={index} className="roboto-bold text-red-400">
+                        <p key={index} className="mukta-bold text-red-400">
                           {rating.value === null
                             ? "Not Found"
                             : rating.value + "%"}
                         </p>
                       ))
                   ) : (
-                    <p className="roboto-bold text-red-400">
+                    <p className="mukta-bold text-red-400">
                       {movieData?.audienceScore}
                     </p>
                   )}
@@ -526,12 +526,12 @@ function SearchPage() {
                     ratingList?.ratings
                       ?.filter((rating) => rating.source === "imdb")
                       .map((rating, index) => (
-                        <p key={index} className="roboto-bold text-yellow-500">
+                        <p key={index} className="mukta-bold text-yellow-500">
                           {rating.value + "/10"}
                         </p>
                       ))
                   ) : (
-                    <p className="roboto-bold text-yellow-500">Not Found</p>
+                    <p className="mukta-bold text-yellow-500">Not Found</p>
                   )}
                 </div>
               </div>
@@ -557,13 +557,13 @@ function SearchPage() {
               </div>
             </div>
 
-            <div className="roboto-bold md:text-lg lg:text-xl">Cast</div>
+            <div className="mukta-bold md:text-lg lg:text-xl">Cast</div>
             <ImageCarousel
               type="cast"
               scrollPos={scrollPos}
               data={movieData?.credits.cast}
             />
-            <div className="roboto-bold mb-8 md:text-lg lg:text-xl">Images</div>
+            <div className="mukta-bold mb-8 md:text-lg lg:text-xl">Images</div>
             <ImageCarousel
               type="backdrop"
               scrollPos={scrollPos}

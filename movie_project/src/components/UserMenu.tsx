@@ -22,22 +22,22 @@ function UserMenu({ onClick }: Props) {
         <hr className="border-plat my-3 mx-2 rounded-xl"></hr>
         <div className="flex flex-col items-center justify-center">
           <div
-            className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl hover:bg-black-hover cursor-pointer"
+            className=" flex items-center pl-6 mukta-regular w-full h-20 rounded-2xl hover:bg-black-hover cursor-pointer"
             onClick={() => navigate("/MyList")}
           >
             <MdFormatListBulleted size={30} className=" mr-3" />
             My Lists
           </div>
-          <div className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl hover:bg-black-hover cursor-pointer">
+          <div className=" flex items-center pl-6 mukta-regular w-full h-20 rounded-2xl hover:bg-black-hover cursor-pointer">
             <IoIosSettings size={30} className=" mr-3" />
             Settings
           </div>
-          <div className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover">
+          <div className=" flex items-center pl-6 mukta-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover">
             <FaRegUser size={28} className=" mr-3" />
             Profile
           </div>
           <div
-            className=" flex items-center pl-6 roboto-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover"
+            className=" flex items-center pl-6 mukta-regular w-full h-20 rounded-2xl cursor-pointer hover:bg-black-hover"
             onClick={onClick}
           >
             <IoLogOutOutline size={30} className=" mr-3" />

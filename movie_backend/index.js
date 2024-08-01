@@ -9,6 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const nonUserRoutes = require("./routes/nonUserRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const moviedleRoutes = require("./routes/moviedleRoutes");
 const bodyParser = require("body-parser");
 const Redis = require("redis");
 const redisClient = Redis.createClient();
@@ -51,6 +52,4 @@ app.use("/user", userRoutes);
 app.use("/homepage", nonUserRoutes);
 app.use("/searchMedia", searchRoutes);
 app.use("/comments", commentRoutes);
-app.get("/ping", (req, res) => {
-  res.send("pong");
-});
+app.use("/moviedle", moviedleRoutes);

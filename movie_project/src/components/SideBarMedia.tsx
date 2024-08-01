@@ -77,7 +77,7 @@ function SideBarMedia({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex lg:flex bg-comp-black text-plat flex-col space-y-6 py-4 px-4 roboto-bold rounded-3xl sticky top-0">
+      <div className="hidden md:flex lg:flex bg-comp-black text-plat flex-col space-y-6 py-4 px-4 mukta-bold rounded-3xl sticky top-0">
         <div
           className={` ${
             MovieOrTV === "Movie"
@@ -156,7 +156,7 @@ function SideBarMedia({
               })}
       </div>
       {/* Mobile Sidebar */}
-      <div className="md:hidden flex bg-yt-black text-plat justify-center roboto-bold">
+      <div className="md:hidden flex bg-yt-black text-plat justify-center mukta-bold">
         <div className="flex flex-row items-center justify-center space-x-4">
           <div
             className={` ${

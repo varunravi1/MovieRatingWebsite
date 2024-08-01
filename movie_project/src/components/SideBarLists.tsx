@@ -23,7 +23,7 @@ function SideBarLists({ selected, setSelected }: Props) {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex bg-comp-black text-plat h-full flex-col space-y-6 py-4 px-4 roboto-bold rounded-3xl">
+      <div className="hidden lg:flex bg-comp-black text-plat h-full flex-col space-y-6 py-4 px-4 mukta-bold rounded-3xl">
         <div
           className={` ${
             selected === "Movie"
@@ -46,7 +46,7 @@ function SideBarLists({ selected, setSelected }: Props) {
         </div>
       </div>
       {/* Mobile Sidebar */}
-      <div className="lg:hidden flex items-center bg-yt-black text-plat justify-center space-x-20 py-4 roboto-bold rounded-3xl">
+      <div className="lg:hidden flex items-center bg-yt-black text-plat justify-center space-x-20 py-4 mukta-bold rounded-3xl">
         <div
           className={`md:text-xl p-2${
             selected === "Movie"

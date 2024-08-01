@@ -186,7 +186,7 @@ function MyLists() {
                     .map((list: media) => (
                       <div className="" key={list._id}>
                         <div
-                          className=" group roboto-bold relative tracking-wider ml-8 mb-4 md:mb-8 mt-4 py-4 pl-4 text-plat text-base md:text-xl hover:bg-comp-black"
+                          className=" group mukta-bold relative tracking-wider ml-8 mb-4 md:mb-8 mt-4 py-4 pl-4 text-plat text-base md:text-xl hover:bg-comp-black"
                           onClick={() => {
                             // handleAddtoList(list);
                           }}
@@ -218,7 +218,7 @@ function MyLists() {
                             className="cursor-pointer flex-shrink-0"
                           /> */}
                           <div
-                            className="text-plat px-4 mb-8 flex space-x-4 md:space-x-10 lg:space-x-16 roboto-regular  overflow-y-hidden lg:overflow-x-hidden"
+                            className="text-plat px-4 mb-8 flex space-x-4 md:space-x-10 lg:space-x-16 mukta-regular  overflow-y-hidden lg:overflow-x-hidden"
                             // key={list.title}
                             ref={(divElement) =>
                               (scrollPos.current[list._id] = divElement)

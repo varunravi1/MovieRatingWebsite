@@ -5,12 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { infinity } from "ldrs";
 import { LoginContext } from "../userContext";
 import BookMarkMiddleMan from "./BookMarkMiddleMan";
+import PopUpLists from "./PopUpLists";
 interface Movie {
   id: number;
   original_title: string;
   poster_path: string;
   release_date: string;
   original_language: string;
+  in_list: Boolean;
 }
 interface media {
   _id: string;
@@ -19,118 +21,103 @@ interface media {
   media: [];
 }
 interface Props {
-  setListScreen: (variable: boolean) => void;
-  mediaData: React.MutableRefObject<Movie | null>;
-  listScreen: boolean;
-  setrerenderBookmark: (variable: boolean) => void;
-  rerenderBookmark: boolean;
+  setLogin: React.Dispatch<React.SetStateAction<boolean>>;
+  type: "movie" | "tv";
 }
 infinity.register();
-function Scroller({
-  listScreen,
-  setListScreen,
-  mediaData,
-  rerenderBookmark,
-  setrerenderBookmark,
-}: Props) {
+function Scroller({ setLogin, type }: Props) {
   const { user, isAuthLoading } = useContext(LoginContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [listScreen, setListScreen] = useState(false);
   const [scoresDict, setScoresDict] = useState<{ [key: string]: string }>({});
   const [movieData, setMovieData] = useState<any[]>([]);
-  const [listData, setListData] = useState<any[]>([]);
-  const bookmarkedLists = useRef<(0 | 1)[]>([]);
-  const movieLists = useRef(new Set());
+  const mediaData = useRef<Movie | null>(null);
   useEffect(() => {
     console.log(isAuthLoading);
     if (!isAuthLoading) {
       sendAPIReq();
     }
   }, [isAuthLoading, user]);
+  useEffect(() => {
+    if (!isAuthLoading && user && !loading) {
+      getLists();
+    }
+  }, [loading]);
+  const getLists = async () => {
+    try {
+      console.log("in getLists");
+      const results = await axios.post("/user/list", { user: user });
+      const fetchedListData = results.data.listData;
+      // setListData(fetchedListData);
+
+      // Create a Set of movie IDs from all lists
+      const movieIdsInLists = new Set<number>();
+      fetchedListData.forEach((list: media) => {
+        if (list.mediaType.toLowerCase() === type) {
+          list.media.forEach((movie: Movie) => {
+            movieIdsInLists.add(movie.id);
+          });
+        }
+      });
+      setMovieData((prevMovieData) =>
+        prevMovieData.map((movie) => ({
+          ...movie,
+          in_list: movieIdsInLists.has(movie.id),
+        }))
+      );
+
+      console.log("Updated movieData with in_list property");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const sendAPIReq = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/homepage/scroller");
+      const response = await axios.get(`/homepage/scroller/${type}`);
       console.log("back from scoller function");
       console.log(user);
-      const movies = response.data.results.filter((movie: Movie) => {
-        const today = new Date();
-        const twoMonthsBefore = new Date(today.setMonth(today.getMonth() - 2));
-        return (
-          new Date(movie.release_date) > twoMonthsBefore &&
-          movie.original_language === "en"
-        );
-      });
-      console.log(movies.length);
-      // console.log(response.data.results);
-      if (user) {
-        console.log("getting the list items");
-        const userLists = await axios.post("/user/list", { user: user });
-        console.log(userLists);
-        userLists.data.listData.forEach((list: media) => {
-          if (list.mediaType === "Movie") {
-            list.media.forEach((movie: Movie) => {
-              movieLists.current.add(movie.id);
-            });
-          }
+      const movies = response.data.results;
+      if (type === "movie") {
+        console.log(movies.length);
+        const movieTitles = movies.map((movie: Movie) => {
+          return movie.original_title;
         });
-      } else {
-        movieLists.current.clear();
-      }
-      console.log(movieLists.current);
-      const movieTitles = movies.map((movie: Movie) => {
-        return movie.original_title;
-      });
-      // console.log(movieTitles);
+        // console.log(movieTitles);
 
-      for (var i = 0; i < movieTitles.length; i++) {
-        movieTitles[i] = movieTitles[i]
-          .trim()
-          .toLowerCase()
-          .replace(/:/g, "")
-          .replace(/-/g, "")
-          .replace(/ /g, "_")
-          .replace(/_+/g, "_"); // Replace multiple underscores with a single underscore;
-      }
-
-      console.log("Sending request to get scores");
-      const scoresPromises = movies.map((movie: Movie, i: number) =>
-        axios.post("/homepage/scores", {
-          title: movie.original_title,
-          url: movieTitles[i],
-          date: movie.release_date,
-        })
-      );
-      const scoresResults = await Promise.all(scoresPromises);
-      const scoreDictTemp = scoresResults.reduce((dict, score, index) => {
-        const bestScore =
-          score.data.criticScore > score.data.audienceScore
-            ? score.data.criticScore
-            : score.data.audienceScore;
-        dict[movies[index].original_title] = bestScore;
-        return dict;
-      }, {});
-
-      // console.log(scoreDictTemp);
-
-      console.log("setting up the bookmark stuff");
-      if (movieLists.current.size != 0) {
-        console.log("inside bookmark loop");
-        console.log(movieLists.current);
-        for (let variable of movies) {
-          if (movieLists.current.has(variable.id)) {
-            console.log("list is in new releases");
-            bookmarkedLists.current = [...bookmarkedLists.current, 1];
-          } else {
-            bookmarkedLists.current = [...bookmarkedLists.current, 0];
-          }
+        for (var i = 0; i < movieTitles.length; i++) {
+          movieTitles[i] = movieTitles[i]
+            .trim()
+            .toLowerCase()
+            .replace(/:/g, "")
+            .replace(/-/g, "")
+            .replace(/ /g, "_")
+            .replace(/_+/g, "_"); // Replace multiple underscores with a single underscore;
         }
-        console.log(bookmarkedLists.current);
-      } else {
-        bookmarkedLists.current.fill(0);
+
+        console.log("Sending request to get scores");
+        const scoresPromises = movies.map((movie: Movie, i: number) =>
+          axios.post("/homepage/scores", {
+            title: movie.original_title,
+            url: movieTitles[i],
+            date: movie.release_date,
+          })
+        );
+        const scoresResults = await Promise.all(scoresPromises);
+        const scoreDictTemp = scoresResults.reduce((dict, score, index) => {
+          const bestScore =
+            score.data.criticScore > score.data.audienceScore
+              ? score.data.criticScore
+              : score.data.audienceScore;
+          dict[movies[index].original_title] = bestScore;
+          return dict;
+        }, {});
+
+        setScoresDict(scoreDictTemp);
       }
-      setScoresDict(scoreDictTemp);
+
       setMovieData(movies);
       setLoading(false);
     } catch (error) {
@@ -139,27 +126,40 @@ function Scroller({
     }
   };
   const handleClickBookmark = async (movie: Movie) => {
-    console.log(movieLists.current);
     if (user) {
       console.log(movie.id);
-      if (movieLists.current.has(movie.id)) {
-        navigate("/MyList");
+      const movieIndex = movieData.findIndex((m) => m.id === movie.id);
+
+      if (movieIndex !== -1) {
+        // Movie found in movieData
+        if (movieData[movieIndex].in_list) {
+          // Movie is already in the list, navigate to MyList
+          navigate("/MyList");
+        } else {
+          // Movie is not in the list, add it
+          mediaData.current = movie;
+          setListScreen(true);
+        }
       } else {
-        setListScreen(true);
-        console.log(movie);
-        mediaData.current = movie;
+        console.log("Movie not found in movieData");
       }
+    } else {
+      setLogin(true);
+      console.log("User not logged in");
     }
   };
   const handlePosterClick = (movie: Movie) => {
     navigate(`/${movie.original_title ? "movie" : "tv"}/${movie.id}`);
   };
+  const updateMovieInList = (movieId: number) => {
+    setMovieData((prevMovieData) =>
+      prevMovieData.map((movie) =>
+        movie.id === movieId ? { ...movie, in_list: true } : movie
+      )
+    );
+  };
   return (
     <>
-      <h1 className="text-white bg-yt-black text-center roboto-bold text-xl xl:text-4xl lg:text-4xl md:text-2xl: sm:text-2xl  pt-8 tracking-[1px] ">
-        NEW RELEASES
-      </h1>
-
       <div className="posters bg-yt-black py-14">
         {loading ? (
           <div className=" flex justify-center w-full ">
@@ -179,27 +179,40 @@ function Scroller({
                     }}
                     key={movie.id}
                     src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    className="movie-poster pb-2 cursor-pointer w-48 md:w-52 lg:w-56"
+                    className="movie-poster pb-2 cursor-pointer w-48 md:w-52 lg:w-56 flex-shrink-0"
                     // alt={`Poster for ${movie.title}`}
                   />
+
                   <div className="overlay-content ml-[90px] mt-32 md:ml-24 md:mt-36 lg:ml-[100px] lg:mt-40">
-                    <img
-                      src="public/Rotten_Tomatoes.png"
-                      alt="Rotten Tomatoes"
-                      className="rotten-tomatoes-logo mr-4"
-                    />
-                    <p className="rotten-tomatoes-score font-bold text-err-red">
-                      {scoresDict[movie.original_title]
-                        ? scoresDict[movie.original_title]
-                        : "Not Available"}
-                    </p>
-                    <BookMarkMiddleMan
-                      movie={movie}
-                      rerenderBookmark={rerenderBookmark}
-                      onClick={() => handleClickBookmark(movie)}
-                      fill={bookmarkedLists.current[i]}
-                      mediaData={mediaData}
-                    ></BookMarkMiddleMan>
+                    {type === "movie" && (
+                      <>
+                        <img
+                          src="public/Rotten_Tomatoes.png"
+                          alt="Rotten Tomatoes"
+                          className="rotten-tomatoes-logo mr-4"
+                        />
+                        <p className="rotten-tomatoes-score font-bold text-err-red">
+                          {scoresDict[movie.original_title]
+                            ? scoresDict[movie.original_title]
+                            : "Not Available"}
+                        </p>
+                      </>
+                    )}
+                    {movie.in_list ? (
+                      <PiBookmarkSimpleFill
+                        className={`size-9 absolute ${
+                          type === "movie" ? "mt-56" : "mt-0"
+                        } bookmark-icon cursor-pointer`}
+                        onClick={() => handleClickBookmark(movie)}
+                      />
+                    ) : (
+                      <PiBookmarkSimple
+                        className={`size-9 absolute ${
+                          type === "movie" ? "mt-56" : "mt-0"
+                        } bookmark-icon cursor-pointer`}
+                        onClick={() => handleClickBookmark(movie)}
+                      />
+                    )}
                   </div>
                 </div>
               ))}
@@ -220,23 +233,31 @@ function Scroller({
                     // alt={`Poster for ${movie.title}`}
                   />
                   <div className="overlay-content ml-[90px] mt-32 md:ml-24 md:mt-36 lg:ml-[100px] lg:mt-40">
-                    <img
-                      src="public/Rotten_Tomatoes.png"
-                      alt="Rotten Tomatoes"
-                      className="rotten-tomatoes-logo mr-4"
-                    />
-                    <p className="rotten-tomatoes-score font-bold text-err-red">
-                      {scoresDict[movie.original_title]
-                        ? scoresDict[movie.original_title]
-                        : "Not Available"}
-                    </p>
-                    <BookMarkMiddleMan
-                      movie={movie}
-                      rerenderBookmark={rerenderBookmark}
-                      onClick={() => handleClickBookmark(movie)}
-                      fill={bookmarkedLists.current[i]}
-                      mediaData={mediaData}
-                    ></BookMarkMiddleMan>
+                    {type === "movie" && (
+                      <>
+                        <img
+                          src="public/Rotten_Tomatoes.png"
+                          alt="Rotten Tomatoes"
+                          className="rotten-tomatoes-logo mr-4"
+                        />
+                        <p className="rotten-tomatoes-score font-bold text-err-red">
+                          {scoresDict[movie.original_title]
+                            ? scoresDict[movie.original_title]
+                            : "Not Available"}
+                        </p>
+                      </>
+                    )}
+                    {movie.in_list ? (
+                      <PiBookmarkSimpleFill
+                        className="size-9 absolute mt-56 bookmark-icon cursor-pointer"
+                        onClick={() => handleClickBookmark(movie)}
+                      />
+                    ) : (
+                      <PiBookmarkSimple
+                        className="size-9 absolute mt-56 bookmark-icon cursor-pointer"
+                        onClick={() => handleClickBookmark(movie)}
+                      />
+                    )}
                   </div>
                 </div>
               ))}
@@ -244,7 +265,14 @@ function Scroller({
           </>
         )}
       </div>
-      {/* <PiBookmarkSimple className=""></PiBookmarkSimple> */}
+      {listScreen && (
+        <PopUpLists
+          mediaData={mediaData}
+          setListScreen={setListScreen}
+          updateMovieInList={updateMovieInList}
+          type={type}
+        />
+      )}
     </>
   );
 }

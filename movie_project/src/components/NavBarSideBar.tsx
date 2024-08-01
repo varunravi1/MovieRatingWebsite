@@ -31,7 +31,7 @@ function NavBarSideBar({ sideBar, setSideBar }: Props) {
         }`}
       >
         <RxHamburgerMenu
-          className="roboto-bold inline-block lg:hidden ml-10 my-5 cursor-pointer"
+          className="mukta-bold inline-block lg:hidden ml-10 my-5 cursor-pointer"
           size={30}
           onClick={() => {
             setSideBar(false);

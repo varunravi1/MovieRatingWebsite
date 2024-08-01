@@ -167,7 +167,7 @@ function ActorPage() {
       <div className="main-container shadow-lg min-h-svh text-plat">
         <NavBarLoggedIn />
         <div className=" mt-6 md:mt-10 md:ml-10">
-          <p className="roboto-bold tracking-wide text-3xl mb-6 text-center md:text-start">
+          <p className="mukta-bold tracking-wide text-3xl mb-6 text-center md:text-start">
             {actorInformation?.name}
           </p>
           <div className="hidden md:flex">
@@ -176,7 +176,7 @@ function ActorPage() {
               className="w-60 h-[360px] rounded-2xl flex-none"
             />
             <div className="flex-grow ml-4">
-              <p className="roboto-regular text-lg">
+              <p className="mukta-regular text-lg">
                 {isExpanded
                   ? actorInformation?.biography
                   : actorInformation?.biography.substring(0, truncateLength)}
@@ -200,7 +200,7 @@ function ActorPage() {
             </div>
 
             <div className="flex-grow ml-2 md:ml-4 mr-2 text-center">
-              <p className="roboto-regular text-lg mb-6">
+              <p className="mukta-regular text-lg mb-6">
                 {isExpanded
                   ? actorInformation?.biography
                   : actorInformation?.biography.substring(0, truncateLength)}
@@ -216,7 +216,7 @@ function ActorPage() {
             </div>
           </div>
           <div className="hidden md:block ml-2">
-            <p className="mt-4 roboto-regular">
+            <p className="mt-4 mukta-regular">
               {actorInformation?.birthday &&
                 "Age: " +
                   (
@@ -226,14 +226,14 @@ function ActorPage() {
                     .toString()
                     .substring(0, 4)}
             </p>
-            <p className="mt-4 roboto-regular">
+            <p className="mt-4 mukta-regular">
               {actorInformation?.place_of_birth &&
                 "Birthplace: " + actorInformation.place_of_birth}
             </p>
           </div>
 
           <div className="mt-10">
-            <p className="roboto-bold tracking-wide text-3xl mb-6 text-plat">
+            <p className="mukta-bold tracking-wide text-3xl mb-6 text-plat">
               Popular
             </p>
             <div className="flex flex-wrap">
@@ -252,14 +252,14 @@ function ActorPage() {
                     alt=""
                     className="w-24 rounded-2xl"
                   />
-                  <div className="ml-6 roboto-regular mt-6">
+                  <div className="ml-6 mukta-regular mt-6">
                     <p className="mb-2">
                       {movie.original_title
                         ? movie.original_title
                         : movie.original_name}
                     </p>
                     <p className="text-sm italic mb-2">{movie.character}</p>
-                    <div className="flex space-x-2 md:space-x-3 roboto-regular text-sm italic">
+                    <div className="flex space-x-2 md:space-x-3 mukta-regular text-sm italic">
                       {movie.genre_ids
                         .filter((_, index) => index < 3)
                         .map((genre: number) => (
@@ -274,7 +274,7 @@ function ActorPage() {
                 </div>
               ))}
             </div>
-            <p className="roboto-bold tracking-wide text-3xl mb-6 text-plat">
+            <p className="mukta-bold tracking-wide text-3xl mb-6 text-plat">
               Images
             </p>
             <ImageCarousel
@@ -283,7 +283,7 @@ function ActorPage() {
               data={actorInformation?.images?.profiles as any}
             />
 
-            <p className="roboto-bold tracking-wide text-3xl mb-6 text-plat">
+            <p className="mukta-bold tracking-wide text-3xl mb-6 text-plat">
               All Movies/Shows
             </p>
             <div className="flex flex-wrap">
@@ -302,14 +302,14 @@ function ActorPage() {
                     alt=""
                     className="w-24 rounded-2xl"
                   />
-                  <div className="ml-6 roboto-regular mt-6">
+                  <div className="ml-6 mukta-regular mt-6">
                     <p className="mb-2">
                       {movie.original_title
                         ? movie.original_title
                         : movie.original_name}
                     </p>
                     <p className="text-sm italic mb-2">{movie.character}</p>
-                    <div className="flex space-x-2 md:space-x-3 roboto-regular text-sm italic">
+                    <div className="flex space-x-2 md:space-x-3 mukta-regular text-sm italic">
                       {movie.genre_ids
                         .filter((_, index) => index < 3)
                         .map((genre: number) => (

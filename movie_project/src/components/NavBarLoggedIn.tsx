@@ -48,7 +48,7 @@ function NavBarLoggedIn() {
 
       <div className=" fixed-bar flex justify-between px-5">
         <RxHamburgerMenu
-          className="navBar roboto-bold inline-block lg:hidden cursor-pointer"
+          className="navBar mukta-bold inline-block lg:hidden cursor-pointer"
           size={30}
           onClick={() => {
             setSideBar(!sideBar);
@@ -57,16 +57,19 @@ function NavBarLoggedIn() {
         <div className="absolute overflow-hidden transition-all">
           <NavBarSideBar sideBar={sideBar} setSideBar={setSideBar} />
         </div>
-        <Link to={"/"} className="navBar roboto-bold hidden lg:inline-block">
+        <Link to={"/"} className="navBar mukta-bold hidden lg:inline-block">
           Home
         </Link>
         <button
-          className="navBar roboto-bold hidden lg:inline-block"
+          className="navBar mukta-bold hidden lg:inline-block"
           onClick={() => navigate("/discover")}
         >
           Discover
         </button>
-        <button className="navBar roboto-bold hidden xl:inline-block">
+        <button
+          className="navBar mukta-bold hidden xl:inline-block"
+          onClick={() => navigate("/Moviedle")}
+        >
           Moviedle
         </button>
         {user ? (
@@ -85,13 +88,13 @@ function NavBarLoggedIn() {
             )}
           </div>
         ) : (
-          // <button className="navBar roboto-bold" onClick={handleLogout}>
+          // <button className="navBar mukta-bold" onClick={handleLogout}>
           //   Logout
           // </button>
 
           <>
             <button
-              className="navBar roboto-bold"
+              className="navBar mukta-bold"
               onClick={() => {
                 setSignUp(true);
               }}

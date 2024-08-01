@@ -175,7 +175,7 @@ const verifyRefreshToken = async (req, res) => {
     console.log(user);
     // console.log(user[0].email);
     if (user) {
-      const newToken = issueAccessToken(user[0].email);
+      const newToken = issueAccessToken(user.email);
       res.json({ accessToken: newToken, user: user });
     } else {
       console.log("No user is logged in.");

@@ -16,6 +16,8 @@ import Discover from "./components/Discover";
 import ActorPage from "./components/ActorPage";
 import { SearchProvider } from "./SearchContext";
 import SearchResults from "./components/SearchResults";
+import MoviedleMenu from "./components/MoviedleMenu";
+import MoviedleGameScreen from "./components/MoviedleGameScreen";
 
 axios.defaults.withCredentials = true;
 let router = createBrowserRouter([
@@ -46,6 +48,10 @@ let router = createBrowserRouter([
   {
     path: "/searchresults",
     element: <SearchResults />,
+  },
+  {
+    path: "/Moviedle",
+    element: <MoviedleMenu />,
   },
 ]);
 function App() {
