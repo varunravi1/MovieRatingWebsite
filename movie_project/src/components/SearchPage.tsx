@@ -18,9 +18,10 @@ import PopUpLists2 from "./PopUpLists2";
 import { LoginContext } from "../userContext";
 import ImageCarousel from "./ImageCarousel";
 import FlipLogin from "./FlipLogin";
-import { MdMovieFilter } from "react-icons/md";
-import { TiTick } from "react-icons/ti";
-import { ImCross } from "react-icons/im";
+// import { MdMovieFilter } from "react-icons/md";
+// import { TiTick } from "react-icons/ti";
+// import { ImCross } from "react-icons/im";
+import { MdOutlineQuestionMark } from "react-icons/md";
 
 interface backDrop {
   aspect_ratio: number;
@@ -121,13 +122,26 @@ function SearchPage() {
   const [streamingInfo, setStreamingInfo] = useState<StreamingInfo[]>([]);
   const [ratingList, setRatings] = useState<Ratings | null>(null);
   const [logIn, setLogIn] = useState(false);
-
+  const [recommendations, setRecommendations] = useState<Movie[]>([]);
+  const [recommendationScreen, setRecommendationScreen] = useState(false);
   // const [scores, setScores] = useState("");
   useEffect(() => {
     getData();
-    getWatchProviders();
-    getRatings();
+    // getWatchProviders();
+    // getRatings();
+    getRecommendations();
   }, []);
+  const getRecommendations = async () => {
+    try {
+      const response = await axios.post("recommend/general", {
+        id: id,
+      });
+      setRecommendations(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const handleBookMark = () => {
     if (user) {
       setPopUpList(true);
@@ -558,17 +572,40 @@ function SearchPage() {
             </div>
 
             <div className="mukta-bold md:text-lg lg:text-xl">Cast</div>
-            <ImageCarousel
-              type="cast"
-              scrollPos={scrollPos}
-              data={movieData?.credits.cast}
-            />
-            <div className="mukta-bold mb-8 md:text-lg lg:text-xl">Images</div>
-            <ImageCarousel
-              type="backdrop"
-              scrollPos={scrollPos}
-              data={movieData?.images?.backdrops}
-            />
+            <div className="mb-4">
+              <ImageCarousel
+                type="cast"
+                scrollPos={scrollPos}
+                data={movieData?.credits.cast}
+              />
+            </div>
+
+            <div className="mukta-bold md:text-lg lg:text-xl">Images</div>
+            <div className="mb-4">
+              <ImageCarousel
+                type="backdrop"
+                scrollPos={scrollPos}
+                data={movieData?.images?.backdrops}
+              />
+            </div>
+
+            <div className="flex items-center mb-2 space-x-2">
+              <div className="mukta-bold md:text-lg lg:text-xl">
+                Recommendations
+              </div>
+              <MdOutlineQuestionMark
+                className="hover:bg-comp-black rounded-full p-2 cursor-pointer"
+                size={35}
+                onClick={() => setRecommendationScreen(true)}
+              />
+            </div>
+            <div className="flex space-x-10 overflow-x-auto custom_scrollbar pb-4 cursor-pointer ">
+              <ImageCarousel
+                type="recommendations"
+                scrollPos={scrollPos}
+                data={recommendations}
+              ></ImageCarousel>
+            </div>
             <Comments movie={movieData}></Comments>
           </div>
           {popupList && user && (
@@ -591,6 +628,48 @@ function SearchPage() {
                 size={30}
                 color="#FFF"
               />
+            </div>
+          )}
+          {recommendationScreen && (
+            <div
+              className={`bg-yt-black bg-opacity-90 fixed top-0 left-0 flex flex-col w-svw h-svh z-50 items-center justify-center space-y-4 mukta-regular`}
+            >
+              <div className="text-center text-plat px-6 bg-comp-black p-10 rounded-2xl">
+                <h2 className="text-xl font-bold mb-2">
+                  Recommendation Model: Work in Progress
+                </h2>
+                <p className="mb-4">
+                  Thank you for using our movie recommendation system! Please
+                  note that this model is a work in progress and will continue
+                  to improve over time. We are building it from scratch, and
+                  your participation is crucial to its development.
+                </p>
+                <p className="mb-4">
+                  We apologize if there are any recommendations that may seem
+                  out of place.
+                </p>
+                <p className="mb-4">
+                  <strong>How You Can Help:</strong>
+                  <br />
+                  <strong>Rate Movies:</strong> The more movies you rate, the
+                  better our system becomes at understanding your preferences
+                  and suggesting movies you'll love.
+                  <br />
+                  <strong>Provide Feedback:</strong> Your feedback helps us
+                  refine our algorithms and improve the overall experience.
+                </p>
+                <p>
+                  We appreciate your patience and support as we work to enhance
+                  the recommendation system. Stay tuned for updates and
+                  improvements! Thank you for being a part of our community.
+                </p>
+                <button
+                  onClick={() => setRecommendationScreen(false)}
+                  className="bg-purp hover:bg-purp-light text-plat font-bold py-2 px-4 rounded mt-4"
+                >
+                  Go Back
+                </button>
+              </div>
             </div>
           )}
           <footer className="footer">© 2024 Your Site Name</footer>

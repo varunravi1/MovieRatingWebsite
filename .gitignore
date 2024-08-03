@@ -28,3 +28,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+recommender_system/recommender_env_311/
+recommender_system/__pycache__/
+recommender_system/cf_model.joblib
+recommender_system/final_df.csv
+recommender_system/tmdb_movieData_df.csv
+recommender_system/movie_features.h5

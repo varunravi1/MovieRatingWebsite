@@ -111,7 +111,6 @@ body {
     transform: translateX(-100%);
   }
 }
-/* Add this to your CSS file or inside a <style> tag in your component */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }

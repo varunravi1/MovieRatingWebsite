@@ -90,14 +90,14 @@ function MoviedleMenu() {
             <div className="flex mb-10">
               <div
                 className={`flex-1 p-4 m-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                  selectedEra === "2015-2024"
+                  selectedEra === "1985-2000"
                     ? "bg-purp-light text-plat scale-105"
                     : "bg-comp-black hover:bg-black-hover"
                 }`}
-                onClick={() => setSelectedEra("2015-2024")}
+                onClick={() => setSelectedEra("1985-2000")}
               >
-                <h3 className="text-xl font-bold mb-2">2015 - 2024</h3>
-                <p className="text-sm">Modern Blockbusters</p>
+                <h3 className="text-xl font-bold mb-2">1985-2000</h3>
+                <p className="text-sm">Classic Gems</p>
               </div>
               <div
                 className={`flex-1 p-4 m-2 rounded-lg cursor-pointer transition-all duration-300 ${
@@ -112,14 +112,14 @@ function MoviedleMenu() {
               </div>
               <div
                 className={`flex-1 p-4 m-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                  selectedEra === "1985-2000"
+                  selectedEra === "2015-2024"
                     ? "bg-purp-light text-plat scale-105"
                     : "bg-comp-black hover:bg-black-hover"
                 }`}
-                onClick={() => setSelectedEra("1985-2000")}
+                onClick={() => setSelectedEra("2015-2024")}
               >
-                <h3 className="text-xl font-bold mb-2">1985-2000</h3>
-                <p className="text-sm">Classic Gems</p>
+                <h3 className="text-xl font-bold mb-2">2015 - 2024</h3>
+                <p className="text-sm">Modern Blockbusters</p>
               </div>
             </div>
             <div className="flex justify-center w-full">

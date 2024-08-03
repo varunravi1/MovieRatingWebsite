@@ -30,7 +30,12 @@ export const getScrollSpeed = () => {
 };
 function ImageCarousel({ scrollPos, data, type }: Props) {
   const navigate = useNavigate();
-  const whichSet = type === "backdrop" ? "images" : "cast";
+  const whichSet =
+    type === "backdrop"
+      ? "images"
+      : type === "cast"
+      ? "cast"
+      : "recommendations";
 
   const handleScroll = (
     id: string,
@@ -102,32 +107,40 @@ function ImageCarousel({ scrollPos, data, type }: Props) {
       />
       <div
         ref={(divElement) => (scrollPos.current[whichSet] = divElement)}
-        className="flex items-center space-x-4 overflow-x-auto lg:overflow-x-hidden overflow-y-hidden justify-between"
+        className="flex items-center space-x-4 overflow-x-auto lg:overflow-x-auto custom-scrollbar overflow-y-hidden justify-between"
       >
-        {data?.map((cast: any) => (
+        {data?.map((object: any) => (
           <div
             className={`py-3 ${
-              type === "backdrop" ? "w-64 lg:w-96" : "w-36 h-80 lg:w-40"
+              type === "backdrop"
+                ? "w-64 lg:w-96"
+                : type === "cast"
+                ? "w-36 lg:w-40"
+                : "w-44"
             } flex-shrink-0 cursor-pointer hover:underline`}
-            key={cast.id}
+            key={object.id}
             onClick={() => {
-              if (type !== "backdrop") {
-                navigate(`/actor/${cast.id}`);
+              if (type === "cast") {
+                navigate(`/actor/${object.id}`);
+              } else if (type === "recommendations") {
+                navigate(`/movie/${object.id}`);
               }
             }}
           >
             <img
               src={`${
-                cast.profile_path
-                  ? `https://image.tmdb.org/t/p/w500/${cast.profile_path}`
-                  : `https://image.tmdb.org/t/p/w500/${cast.file_path}`
+                object.profile_path
+                  ? `https://image.tmdb.org/t/p/w500/${object.profile_path}`
+                  : object.file_path
+                  ? `https://image.tmdb.org/t/p/w500/${object.file_path}`
+                  : `https://image.tmdb.org/t/p/w500/${object.poster_path}`
               }`}
               className={`rounded-xl mb-2`}
             ></img>
-            {cast.name && cast.character && (
+            {object.name && object.character && (
               <>
-                <h1 className="mukta-regular text-base ">{cast.name}</h1>
-                <p className="mukta-light text-xs ">{cast.character}</p>
+                <h1 className="mukta-regular text-base ">{object.name}</h1>
+                <p className="mukta-light text-xs ">{object.character}</p>
               </>
             )}
           </div>

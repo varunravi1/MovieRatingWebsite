@@ -112,9 +112,12 @@ function MoviedleGameScreen({ movie, selectedEra }: Props) {
       );
       // localStorage.setItem("accessToken", response.data.accessToken);
       setBlurLevel(0);
-    }
-    if (guessCount == 10) {
+    } else if (guessCount == 9) {
       setWinningScreen(true);
+      localStorage.setItem(
+        `moviedle_${Era[selectedEra as keyof typeof Era]}_lastPlayed`,
+        new Date().toISOString().split("T")[0]
+      );
       setBlurLevel(0);
     }
     const recentYear = recentGuess.release_date.split("-")[0];

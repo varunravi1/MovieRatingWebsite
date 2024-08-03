@@ -6,9 +6,44 @@ function getRandomNumber(min = 1, max = 50) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function getRandomMovie(movieList) {
-  const randomIndex = Math.floor(Math.random() * movieList.length);
-  return movieList[randomIndex];
+function getRandomMovie(movieList, era) {
+  if (!movieList || movieList.length === 0) {
+    console.error("Movie list is empty or undefined");
+    return null;
+  }
+
+  let topYear, bottomYear;
+  switch (era) {
+    case "millennium":
+      topYear = 2015;
+      bottomYear = 2000;
+      break;
+    case "classic":
+      topYear = 2000;
+      bottomYear = 1985;
+      break;
+    default: // modern
+      topYear = 2024;
+      bottomYear = 2015;
+  }
+
+  // Filter movies within the era
+  const eligibleMovies = movieList.filter((movie) => {
+    if (!movie || !movie.release_date) {
+      console.warn("Found a movie without a release date:", movie);
+      return false;
+    }
+    const year = parseInt(movie.release_date.split("-")[0], 10);
+    return year >= bottomYear && year <= topYear;
+  });
+
+  if (eligibleMovies.length === 0) {
+    console.error(`No movies found for era: ${era}`);
+    return null;
+  }
+
+  const randomIndex = Math.floor(Math.random() * eligibleMovies.length);
+  return eligibleMovies[randomIndex];
 }
 
 async function fetchMoviesWithRetry(url, maxRetries = 3) {
@@ -90,9 +125,9 @@ async function dailyTask() {
       ),
     ]);
 
-    const classicId = getRandomMovie(classic).id;
-    const millenniumId = getRandomMovie(millennium).id;
-    const modernId = getRandomMovie(modern).id;
+    const classicId = getRandomMovie(classic, "classic").id;
+    const millenniumId = getRandomMovie(millennium, "millennium").id;
+    const modernId = getRandomMovie(modern, "modern").id;
 
     const [classicMovie, millenniumMovie, modernMovie] = await Promise.all([
       fetchMovieDetails(classicId),
