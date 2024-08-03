@@ -126,11 +126,16 @@ function SearchPage() {
   const [recommendationScreen, setRecommendationScreen] = useState(false);
   // const [scores, setScores] = useState("");
   useEffect(() => {
+    setStreamingInfo([]);
+    setRatings(null);
+    setMovieData(null);
+    setRecommendations([]);
     getData();
-    // getWatchProviders();
-    // getRatings();
+    getWatchProviders();
+    getRatings();
+
     getRecommendations();
-  }, []);
+  }, [mediaType, id]);
   const getRecommendations = async () => {
     try {
       const response = await axios.post("recommend/general", {

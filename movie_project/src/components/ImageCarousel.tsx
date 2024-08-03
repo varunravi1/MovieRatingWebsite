@@ -123,7 +123,7 @@ function ImageCarousel({ scrollPos, data, type }: Props) {
               if (type === "cast") {
                 navigate(`/actor/${object.id}`);
               } else if (type === "recommendations") {
-                navigate(`/movie/${object.id}`);
+                navigate(`/movie/${object.id}`, { replace: true });
               }
             }}
           >
